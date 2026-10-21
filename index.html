@@ -1,0 +1,939 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Гардероб Родиона</title></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a fitting-room board. Items sit on a light "studio" ground like product cut-outs;
+   hang-tag labels in mono carry category / colour; looks are numbered boards. */
+:root{
+  --bg:#eceef1; --surface:#f8f9fb; --card:#ffffff; --ink:#15171c; --muted:#5d6370; --line:#d6d9df;
+  --accent:#2f47c9; --accent-ink:#ffffff; --tag:#f1e9d8; --tag-ink:#4a3f2a; --good:#2f7d4f; --warn:#a2591b;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121419; --surface:#1a1d24; --card:#e9ebef; --ink:#eef0f4; --muted:#9aa1ae; --line:#2c303a;
+  --accent:#8ea0ff; --accent-ink:#0d1020; --tag:#3a3325; --tag-ink:#efe2c4; --good:#6fcf97; --warn:#f0a35e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121419; --surface:#1a1d24; --card:#e9ebef; --ink:#eef0f4; --muted:#9aa1ae; --line:#2c303a;
+  --accent:#8ea0ff; --accent-ink:#0d1020; --tag:#3a3325; --tag-ink:#efe2c4; --good:#6fcf97; --warn:#f0a35e; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 110px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:14px 10px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase;margin:0}
+.brand small{display:block;font-family:var(--f-mono);font-weight:400;font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:none}
+nav.tabs{display:flex;gap:4px;margin-left:auto}
+nav.tabs button{border:0;background:transparent;padding:8px 14px;border-radius:999px;font-weight:500;color:var(--muted)}
+nav.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:760px){
+  nav.tabs{position:fixed;left:0;right:0;bottom:0;margin:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);
+    justify-content:space-around;padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  nav.tabs button{flex:1;padding:8px 2px;font-size:12.5px;border-radius:10px}
+  .brand{font-size:17px}
+}
+h2.sec{font-family:var(--f-display);font-weight:500;font-size:15px;letter-spacing:.06em;text-transform:uppercase;margin:26px 0 12px;display:flex;align-items:center;gap:10px;text-wrap:balance}
+h2.sec .count{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:0}
+.lead{color:var(--muted);max-width:62ch;margin:6px 0 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px;font-size:13.5px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);padding:10px 16px;border-radius:10px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:7px 12px;font-size:13.5px}
+.btn:disabled{opacity:.5;cursor:default}
+.palette{display:flex;gap:6px;flex-wrap:wrap}
+.swatch{display:flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px}
+.swatch i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+@media (max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px;text-align:left;display:flex;flex-direction:column;gap:6px;min-width:0}
+.item:hover{border-color:var(--muted)}
+.pic{background:var(--card);border-radius:10px;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;max-width:100%}
+.pic img{width:100%;height:100%;object-fit:contain}
+.pic svg{width:78%;height:78%}
+.item .nm{font-weight:500;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--tag);color:var(--tag-ink);padding:2px 7px;border-radius:4px;align-self:flex-start;white-space:nowrap}
+.tag.ex{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.looks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+@media (max-width:420px){.looks{grid-template-columns:1fr}}
+.look{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:12px;min-width:0}
+.look .board{background:var(--card);border-radius:10px;display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:6px;aspect-ratio:4/5;max-width:100%}
+.look .board .cell{display:grid;place-items:center;min-height:0;overflow:hidden}
+.look .board .cell img{max-width:100%;max-height:100%;object-fit:contain}
+.look .board .cell svg{width:88%;height:88%}
+.look .board .cell.wide{grid-column:1/-1}
+.look h3{font-family:var(--f-display);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 2px}
+.look .num{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.look ul{margin:8px 0 0;padding:0;list-style:none;font-size:13.5px;display:grid;gap:3px}
+.look ul li{overflow-wrap:anywhere}
+.look .why{font-size:12.5px;color:var(--muted);margin-top:8px}
+.look ul.tobuy{margin-top:10px;gap:6px}
+.look ul.tobuy li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:8px;align-items:start;overflow-wrap:normal}
+.look ul.tobuy a.go{display:inline-block;margin-top:4px}
+.look ul.tobuy img{width:36px;height:46px;object-fit:cover;border-radius:6px;background:var(--line)}
+.look ul.tobuy small{display:block;color:var(--muted);font-size:11.5px}
+.look ul.tobuy a.go{font-family:var(--f-mono);font-size:11px;text-decoration:none;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:4px 7px;white-space:nowrap}
+.look .bl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.look .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.style{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:left;display:flex;flex-direction:column;gap:8px}
+.style[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.style h3{font-family:var(--f-display);font-weight:500;font-size:15px;margin:0}
+.style p{margin:0;color:var(--muted);font-size:13.5px}
+.dots{display:flex;gap:4px}.dots i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.pick{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px}
+.pick .pic{aspect-ratio:1/1}
+.pick h4{margin:0;font-size:14.5px;font-weight:600}
+.pick p{margin:4px 0 8px;font-size:13px;color:var(--muted)}
+.stores{display:flex;flex-wrap:wrap;gap:5px}
+.stores a{font-family:var(--f-mono);font-size:11px;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 7px;background:var(--bg)}
+.stores a:hover{border-color:var(--accent);color:var(--accent)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:22px;color:var(--muted);text-align:center}
+.note{font-size:12.5px;color:var(--muted)}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,12,18,.45);z-index:40;display:flex;justify-content:center;align-items:flex-end}
+@media (min-width:761px){.scrim{align-items:center}}
+.sheet{background:var(--bg);width:min(760px,100%);max-height:92%;overflow:auto;border-radius:18px 18px 0 0;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+@media (min-width:761px){.sheet{border-radius:18px;padding:22px 24px}}
+.sheet .hd{display:flex;align-items:flex-start;gap:12px}
+.sheet .hd h2{font-family:var(--f-display);font-weight:500;font-size:18px;margin:0;flex:1;text-wrap:balance;overflow-wrap:anywhere}
+.x{border:1px solid var(--line);background:var(--surface);width:36px;height:36px;border-radius:50%;font-size:18px;line-height:1;flex:none}
+.detail{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;margin-top:12px}
+@media (max-width:520px){.detail{grid-template-columns:1fr}.detail .pic{max-width:240px}}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;margin:0}
+.kv dt{font-family:var(--f-mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:2px}
+.kv dd{margin:0}
+form.f{display:grid;gap:12px;margin-top:12px}
+form.f label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+form.f input,form.f select,form.f textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink);width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.picker button{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:5px;font-size:11.5px;display:grid;gap:4px;text-align:left}
+.picker button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.icon-hd{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+@media (max-width:640px){.icon-hd{grid-template-columns:1fr}}
+.icon-hd h3{font-family:var(--f-display);font-weight:700;font-size:20px;margin:0;text-wrap:balance}
+.traits{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.fit{margin:12px 0 0;font-size:13.5px;background:var(--tag);color:var(--tag-ink);border-radius:10px;padding:8px 12px}
+.looks.wide{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+@media (max-width:420px){.looks.wide{grid-template-columns:1fr}}
+.icon-look ul.buy{gap:8px}
+.icon-look ul.buy li{display:grid;gap:3px}
+.have{font-size:12px;color:var(--good)}
+.icon-look{grid-template-columns:minmax(0,1fr)}
+.icon-look .me{width:100%;min-width:0}
+.icon-look .board{display:flex;aspect-ratio:auto;height:130px;gap:4px}
+.icon-look .board .cell{flex:1 1 0;min-width:0}
+@media (max-width:420px){.icon-look .board{height:96px}}
+[hidden]{display:none!important}
+.icon-look .board[hidden],.look .board[hidden]{display:none}
+.caplooks{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+@media (max-width:420px){.caplooks{grid-template-columns:1fr}}
+.caplook{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.caphd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.caphd h3{font-family:var(--f-display);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 0}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;padding:2px;flex:none}
+.seg button{border:0;background:transparent;padding:5px 10px;border-radius:999px;font-size:12.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.rboard{background:#ebe9e5;border-radius:10px;display:grid;gap:2px;padding:6px;grid-template-columns:1fr 1fr;aspect-ratio:1/1;max-width:100%}
+.rboard.n3 .cell:last-child,.rboard.n5 .cell:last-child{grid-column:1/-1}
+.rboard{grid-template-rows:1fr 1fr}
+.rboard.n3{grid-template-rows:1.4fr 0.6fr}
+.rboard.n5{grid-template-rows:1fr 1fr 0.5fr}
+.rboard .cell{min-height:0;min-width:0;overflow:hidden}
+.rboard .cell img{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.me{display:grid;grid-template-columns:1fr;aspect-ratio:2/3;max-width:100%;position:relative}
+.me img{width:100%;height:100%;object-fit:cover;border-radius:10px;background:#e6e7ea}
+.me img:first-child{object-position:center top}
+.me .melab{position:absolute;right:6px;bottom:6px;font-family:var(--f-mono);font-size:10.5px;background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:4px}
+.seg button{padding:5px 8px}
+.mstrip{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:10px;aspect-ratio:1/1;max-width:100%}
+.mstrip img{height:100%;width:auto;flex:none;border-radius:8px;scroll-snap-align:start}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.plist li{display:grid;grid-template-columns:40px minmax(0,1fr) auto auto;gap:8px;align-items:center;font-size:13.5px}
+.plist li img{width:40px;height:40px;object-fit:contain;background:#ebe9e5;border-radius:6px}
+.plist .pn{overflow-wrap:anywhere;line-height:1.25}
+.plist .pn small{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.plist .pp{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;font-weight:500}
+.plist .pp s{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.plist .buy{font-family:var(--f-mono);font-size:11px;text-decoration:none;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:4px 7px;white-space:nowrap}
+@media (max-width:420px){.plist li{grid-template-columns:40px minmax(0,1fr) auto}.plist .buy{grid-column:2/-1;justify-self:start}}
+.captot{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-top:1px solid var(--line);padding-top:8px;font-size:13px;color:var(--muted)}
+.captot b{color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.item.prod{text-decoration:none;color:inherit}
+.pic.real{aspect-ratio:2/3;background:#ebe9e5}
+.pic.real img{object-fit:cover}
+.pr{font-variant-numeric:tabular-nums;font-size:13.5px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;max-width:calc(100% - 32px)}
+.ai{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px}
+.ai textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-height:70px;resize:vertical}
+.ai .out{white-space:pre-wrap;font-size:14px}
+.status{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.item,.look,.style{transition:border-color .15s}}
+.me img{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:1000;background:rgba(10,10,12,.94);overflow:auto;display:flex;touch-action:pan-x pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.lb img{display:block;max-width:100vw;max-height:calc(100vh - 80px - env(safe-area-inset-bottom,0px));width:auto;height:auto;margin:auto;object-fit:contain;cursor:zoom-in;-webkit-user-select:none;user-select:none}
+.lb.z img{max-width:none;max-height:none;width:min(230vw,1800px);margin:0;cursor:zoom-out}
+.lb .bar{position:fixed;left:0;right:0;bottom:0;z-index:1001;display:flex;justify-content:center;gap:10px;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.lb .bar button{min-width:132px;height:46px;border-radius:999px;border:0;background:rgba(255,255,255,.95);color:#111;font:600 15px var(--f-body);cursor:pointer}
+.static [data-del-look],.static [data-save],.static #addItem,.static #manual,.static .ai{display:none!important}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1 class="brand">Гардероб<small id="sync">загружаю…</small></h1>
+    <nav class="tabs" aria-label="Разделы">
+      <button data-tab="wardrobe" aria-current="true">Вещи</button>
+      <button data-tab="looks">Образы</button>
+      <button data-tab="styles">Стили</button>
+      <button data-tab="shop">Докупить</button>
+      <button data-tab="icons">Иконы</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="layer"></div>
+
+<script>
+(() => {
+/* ---------- reference data ---------- */
+const CATS = {
+  tee:{ru:"Футболка",slot:"top"}, shirt:{ru:"Рубашка",slot:"top"}, knit:{ru:"Свитер / джемпер",slot:"top"},
+  hoodie:{ru:"Худи / свитшот",slot:"top"}, outer:{ru:"Куртка / верх",slot:"outer"},
+  jeans:{ru:"Джинсы",slot:"bottom"}, trousers:{ru:"Брюки",slot:"bottom"}, shorts:{ru:"Шорты",slot:"bottom"},
+  sneakers:{ru:"Кроссовки",slot:"shoes"}, shoes:{ru:"Туфли / лоферы",slot:"shoes"}, boots:{ru:"Ботинки",slot:"shoes"},
+  acc:{ru:"Аксессуар",slot:"acc"}, blazer:{ru:"Пиджак / блейзер",slot:"outer"}, vest:{ru:"Жилет",slot:"outer"}, glasses:{ru:"Очки",slot:"acc"}
+};
+const SLOT_RU = {top:"Верх",outer:"Верхний слой",bottom:"Низ",shoes:"Обувь",acc:"Аксессуар"};
+const COLORS = {
+  black:{ru:"чёрный",hex:"#1d1e22",n:1}, white:{ru:"белый",hex:"#f4f4f2",n:1}, grey:{ru:"серый",hex:"#9a9da3",n:1},
+  charcoal:{ru:"графит",hex:"#45484f",n:1}, navy:{ru:"тёмно-синий",hex:"#22304f",n:1}, beige:{ru:"бежевый",hex:"#d8c6a5",n:1},
+  cream:{ru:"молочный",hex:"#ece4d3",n:1}, brown:{ru:"коричневый",hex:"#6b4a33",n:1}, denim:{ru:"деним",hex:"#5c7ca6",n:1},
+  lightdenim:{ru:"светлый деним",hex:"#9db5d3",n:1}, olive:{ru:"оливковый",hex:"#6c6b42",n:0}, khaki:{ru:"хаки",hex:"#a69b74",n:1},
+  burgundy:{ru:"бордовый",hex:"#6e2232",n:0}, green:{ru:"зелёный",hex:"#2f5d43",n:0}, blue:{ru:"синий",hex:"#2f5fb3",n:0},
+  red:{ru:"красный",hex:"#b8312f",n:0}, sky:{ru:"голубой",hex:"#a9c6e6",n:0},
+  camel:{ru:"кэмел",hex:"#b58a57",n:1}, sand:{ru:"песочный",hex:"#cdb68f",n:1}, taupe:{ru:"серо-бежевый",hex:"#9c8f80",n:1}
+};
+const STYLES = [
+  {id:"casual",ru:"Кэжуал",d:"Каждый день: футболка, джинсы, кеды. Просто и аккуратно.",dots:["white","denim","navy","beige"]},
+  {id:"smart",ru:"Смарт-кэжуал",d:"На встречу или ужин: рубашка или трикотаж, брюки, лоферы или чистые кеды.",dots:["navy","white","beige","brown"]},
+  {id:"street",ru:"Стритвир",d:"Свободный крой, худи, бомбер, широкие джинсы, массивные кроссовки.",dots:["black","grey","olive","white"]},
+  {id:"oldmoney",ru:"Олд мани",d:"Тихая роскошь: поло-трикотаж, молочный, кэмел, коричневая замша.",dots:["cream","beige","brown","navy"]},
+  {id:"minimal",ru:"Минимализм",d:"Чёрный, белый, серый. Чистые силуэты без логотипов.",dots:["black","white","grey","charcoal"]},
+  {id:"sport",ru:"Спорт-шик",d:"Спортивные вещи в городском сочетании: зип-худи, джоггеры, ретро-кроссовки.",dots:["grey","black","white","sky"]}
+];
+const STYLE_RU = Object.fromEntries(STYLES.map(s=>[s.id,s.ru]));
+
+/* Store links: Zara Georgia has working search; the rest open a site search on the Georgian store. */
+const STORES = {
+  zara:{ru:"Zara",url:q=>`https://www.zara.com/ge/en/search?searchTerm=${encodeURIComponent(q)}&section=MAN`},
+  hm:{ru:"H&M",url:q=>`https://www.google.com/search?q=${encodeURIComponent("site:hm.com/ge men "+q)}`},
+  pb:{ru:"Pull&Bear",url:q=>`https://www.google.com/search?q=${encodeURIComponent("site:pullandbear.com/ge men "+q)}`},
+  bershka:{ru:"Bershka",url:q=>`https://www.google.com/search?q=${encodeURIComponent("site:bershka.com/ge men "+q)}`},
+  md:{ru:"Massimo Dutti",url:q=>`https://www.google.com/search?q=${encodeURIComponent("site:massimodutti.com/ge men "+q)}`}
+};
+/* Trend picks, autumn–winter 2026 (stylist's selection; check the store for current stock and price). */
+const PICKS = [
+  {id:"p1",ru:"Замшевая куртка-бомбер",cat:"outer",color:"brown",styles:["oldmoney","smart","casual"],q:"suede bomber jacket",st:["zara","md","pb"],why:"Замша и шоколадный цвет главные в этом сезоне. Сразу делает простые джинсы и футболку дороже."},
+  {id:"p2",ru:"Широкие джинсы (wide leg)",cat:"jeans",color:"denim",styles:["street","casual"],q:"baggy jeans",st:["pb","bershka","zara","hm"],why:"Скинни ушли. Свободные и слегка изогнутые джинсы сейчас базовые."},
+  {id:"p3",ru:"Брюки со стрелками свободного кроя",cat:"trousers",color:"charcoal",styles:["smart","minimal","oldmoney"],q:"pleated relaxed trousers",st:["zara","md","hm"],why:"Широкая брючина с защипами вместо зауженных чинос."},
+  {id:"p4",ru:"Трикотажное поло с длинным рукавом",cat:"knit",color:"cream",styles:["oldmoney","smart"],q:"knit polo long sleeve",st:["md","zara","hm"],why:"Главная вещь тихой роскоши. Подходит и под джинсы, и под брюки."},
+  {id:"p5",ru:"Свитер на молнии (quarter-zip)",cat:"knit",color:"navy",styles:["smart","oldmoney","casual"],q:"quarter zip sweater",st:["md","zara","hm","pb"],why:"Носится поверх футболки или рубашки, выглядит собранно без пиджака."},
+  {id:"p6",ru:"Ретро-кроссовки из замши",cat:"sneakers",color:"burgundy",styles:["casual","street","sport"],q:"retro suede sneakers",st:["zara","pb","bershka"],why:"Низкие тонкие кроссовки в духе 70-х вытесняют массивные «дэд-шуз»."},
+  {id:"p7",ru:"Кожаная куртка (коричневая)",cat:"outer",color:"brown",styles:["street","casual","smart"],q:"leather jacket brown",st:["zara","bershka","pb","md"],why:"Коричневая кожа вместо чёрной: мягче и актуальнее."},
+  {id:"p8",ru:"Рабочая куртка (chore jacket)",cat:"outer",color:"khaki",styles:["casual","minimal"],q:"chore jacket workwear",st:["hm","zara","pb"],why:"Воркуэр-силуэт с накладными карманами. Работает как пиджак для кэжуала."},
+  {id:"p9",ru:"Фланелевая рубашка-овершот",cat:"shirt",color:"brown",styles:["casual","street"],q:"overshirt flannel",st:["pb","bershka","hm","zara"],why:"Носится расстёгнутой поверх футболки как лёгкая куртка."},
+  {id:"p10",ru:"Свитер крупной вязки",cat:"knit",color:"burgundy",styles:["oldmoney","casual"],q:"chunky knit sweater",st:["zara","md","hm"],why:"Бордовый в тренде второй сезон подряд. Крупная вязка добавляет фактуру."},
+  {id:"p11",ru:"Лоферы",cat:"shoes",color:"brown",styles:["oldmoney","smart"],q:"loafers",st:["zara","md"],why:"Лоферы с джинсами и белыми носками сейчас носят даже в кэжуале."},
+  {id:"p12",ru:"Зип-худи плотное",cat:"hoodie",color:"grey",styles:["sport","street","casual"],q:"zip hoodie heavyweight",st:["hm","pb","bershka"],why:"Серый меланж и плотный хлопок. Под бомбер или кожаную куртку."},
+  {id:"p13",ru:"Варсити-бомбер",cat:"outer",color:"navy",styles:["street","sport"],q:"varsity jacket",st:["bershka","pb","hm"],why:"Студенческий бомбер с нашивками остаётся хитом стритвира."},
+  {id:"p14",ru:"Приталенная футболка slim fit",cat:"tee",color:"white",styles:["minimal","smart","casual"],q:"slim fit t-shirt",st:["zara","md","hm","pb"],why:"Плотный хлопок по фигуре. Заправляй в широкие брюки или джинсы, так силуэт выглядит собранно."},
+  {id:"p15",ru:"Пальто-шинель / длинное пальто",cat:"outer",color:"charcoal",styles:["minimal","smart","oldmoney"],q:"wool blend coat",st:["zara","md","hm"],why:"Длинное пальто поверх худи или свитера для зимы в Тбилиси."},
+  {id:"p16",ru:"Кепка из вельвета или замши",cat:"acc",color:"brown",styles:["casual","street","oldmoney"],q:"corduroy cap",st:["pb","bershka","hm","zara"],why:"Недорогой способ добавить модную фактуру."},
+  {id:"p17",ru:"Замшевые ботинки челси",cat:"boots",color:"brown",styles:["smart","oldmoney","casual"],q:"suede chelsea boots",st:["zara","md"],why:"Заменяют кроссовки осенью и подходят и к джинсам, и к брюкам."},
+  {id:"p18",ru:"Технический анорак / шелл",cat:"outer",color:"olive",styles:["street","sport"],q:"technical jacket",st:["pb","bershka","hm"],why:"Горпкор-ветровка с капюшоном на дождливую погоду."}
+];
+
+/* ---------- placeholder silhouettes ---------- */
+const SHAPES = {
+  tee:'<path d="M30 18 L42 13 Q50 21 58 13 L70 18 L87 33 L77 43 L70 38 L70 87 L30 87 L30 38 L23 43 L13 33 Z"/>',
+  shirt:'<path d="M32 14 L44 10 L50 19 L56 10 L68 14 L84 30 L88 82 L78 82 L72 42 L72 90 L28 90 L28 42 L22 82 L12 82 L16 30 Z"/><path class="ln" d="M50 19 V90 M44 10 L50 24 L56 10"/>',
+  knit:'<path d="M32 15 Q50 24 68 15 L84 30 L88 84 L78 84 L72 44 L72 90 L28 90 L28 44 L22 84 L12 84 L16 30 Z"/><path class="ln" d="M28 85 H72 M12 79 H22 M78 79 H88"/>',
+  hoodie:'<path d="M36 16 Q38 4 50 4 Q62 4 64 16 L84 30 L88 84 L78 84 L72 44 L72 90 L28 90 L28 44 L22 84 L12 84 L16 30 Z"/><path class="ln" d="M40 18 Q50 28 60 18 M38 62 H62 V74 H38 Z"/>',
+  outer:'<path d="M32 12 L44 9 L50 16 L56 9 L68 12 L85 28 L90 86 L79 86 L73 42 L74 92 L26 92 L27 42 L21 86 L10 86 L15 28 Z"/><path class="ln" d="M50 16 V92 M30 60 H42 M58 60 H70"/>',
+  jeans:'<path d="M30 8 L70 8 L75 93 L56 93 L50 34 L44 93 L25 93 Z"/><path class="ln" d="M30 15 H70 M36 15 Q38 26 30 28 M64 15 Q62 26 70 28"/>',
+  trousers:'<path d="M31 8 L69 8 L76 93 L56 93 L50 30 L44 93 L24 93 Z"/><path class="ln" d="M31 14 H69 M40 14 L42 90 M60 14 L58 90"/>',
+  shorts:'<path d="M28 22 L72 22 L77 66 L54 66 L50 42 L46 66 L23 66 Z"/><path class="ln" d="M28 28 H72"/>',
+  sneakers:'<path d="M8 62 Q10 46 26 44 L40 42 Q50 52 66 54 L84 58 Q93 60 91 70 L10 70 Z"/><path class="ln" d="M9 70 H91 V76 H9 Z M40 46 L46 56 M34 47 L40 57"/>',
+  shoes:'<path d="M8 64 Q12 52 30 52 L58 54 Q78 54 88 62 Q94 68 88 72 L10 72 Z"/><path class="ln" d="M9 72 H89 M40 54 Q50 60 60 55"/>',
+  boots:'<path d="M26 12 L54 12 L54 54 L80 60 Q92 64 90 76 L24 76 Z"/><path class="ln" d="M24 76 H90 V81 H24 Z M44 14 V50"/>',
+  acc:'<path d="M20 62 Q22 30 50 28 Q78 30 80 62 Z"/><path class="ln" d="M76 60 L96 64 L96 68 L76 66 M50 28 V62"/>',
+  blazer:'<path d="M32 12 L44 9 L50 30 L56 9 L68 12 L85 28 L90 86 L79 86 L73 42 L74 92 L26 92 L27 42 L21 86 L10 86 L15 28 Z"/><path class="ln" d="M44 9 L40 30 L50 52 L60 30 L56 9 M50 52 V92 M58 70 H68"/>',
+  vest:'<path d="M34 12 L44 10 Q50 22 56 10 L66 12 L72 30 L74 92 L26 92 L28 30 Z"/><path class="ln" d="M50 18 V92 M28 40 H72 M27 56 H73 M26 72 H74"/>',
+  glasses:'<path d="M10 44 H90 V48 H10 Z M14 46 Q14 70 30 70 Q44 70 46 48 Z M54 48 Q56 70 70 70 Q86 70 86 46 Z"/>'
+};
+function shade(hex,k){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;
+  r=Math.round(r*k);g=Math.round(g*k);b=Math.round(b*k);return `rgb(${Math.min(r,255)},${Math.min(g,255)},${Math.min(b,255)})`}
+function art(item){
+  if(item.img) return `<img src="${esc(item.img)}" alt="${esc(item.name||"")}" loading="lazy">`;
+  const c=(COLORS[item.color]||COLORS.grey).hex; const s=SHAPES[item.cat]||SHAPES.tee;
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="${c}" stroke="${shade(c,.6)}" stroke-width="1.6" stroke-linejoin="round">${s}</g><style>.ln{fill:none}</style></svg>`;
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+/* ---------- state ---------- */
+const S = {tab:"wardrobe", items:[], outfits:[], cat:"all", style:"all", shopStore:"all", shopStyle:"all", loaded:false, db:null, assets:null, sample:undefined, gen:[], genStyle:"casual"};
+try{const t=localStorage.getItem("wr_tab"); if(t) S.tab=t;}catch(e){}
+
+const $view=document.getElementById("view"), $layer=document.getElementById("layer"), $sync=document.getElementById("sync");
+const byId=id=>S.items.find(i=>i.id===id);
+
+/* ---------- outfit engine ---------- */
+function compat(a,b){ // colour harmony between two items
+  const A=COLORS[a.color]||COLORS.grey, B=COLORS[b.color]||COLORS.grey;
+  if(a.color===b.color && !["denim","lightdenim"].includes(a.color) && a.color!=="black" && a.color!=="white") return -1;
+  if(A.n||B.n) return 1; return -0.6;
+}
+function scoreLook(parts,style){
+  let s=0; const list=parts.filter(Boolean);
+  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++) s+=compat(list[i],list[j]);
+  const bright=list.filter(x=>!(COLORS[x.color]||{}).n).length; if(bright>2) s-=3;
+  if(style!=="all") s+=list.filter(x=>(x.styles||[]).includes(style)).length*1.2;
+  const [top,outer,bottom,shoes]=parts;
+  if(bottom&&bottom.cat==="shorts"&&(outer||shoes&&shoes.cat==="boots")) s-=4;
+  if(bottom&&bottom.cat==="trousers"&&top&&top.cat==="hoodie"&&style==="smart") s-=2;
+  if(shoes&&shoes.cat==="shoes"&&top&&top.cat==="hoodie") s-=2;
+  /* Timberland-type boots: jeans/cargo only, never with tailored trousers or quiet-luxury looks, not tone-on-tone with the top */
+  if(shoes&&shoes.cat==="boots"&&bottom&&bottom.cat==="trousers") s-=5;
+  if(shoes&&shoes.cat==="boots"&&["oldmoney","smart","minimal"].includes(style)) s-=4;
+  if(shoes&&shoes.cat==="boots"&&top&&top.color===shoes.color) s-=2;
+  if(style==="minimal"&&bright) s-=bright*2;
+  return s;
+}
+function generate({style="all",pin=null,count=6,seed=Math.random()}={}){
+  const fits=x=>style==="all"||(x.styles||[]).includes(style)||(pin&&x.id===pin.id);
+  const slot=sl=>S.items.filter(x=>CATS[x.cat]?.slot===sl);
+  let tops=slot("top"),outers=slot("outer"),bottoms=slot("bottom"),shoes=slot("shoes"),accs=slot("acc");
+  const pick=(arr)=>{const f=arr.filter(fits);return f.length?f:arr};
+  tops=pick(tops);bottoms=pick(bottoms);shoes=pick(shoes);outers=outers.filter(fits);accs=accs.filter(fits);
+  if(pin){const sl=CATS[pin.cat]?.slot;
+    if(sl==="top")tops=[pin]; if(sl==="bottom")bottoms=[pin]; if(sl==="shoes")shoes=[pin];
+    if(sl==="outer")outers=[pin]; if(sl==="acc")accs=[pin];}
+  if(!tops.length||!bottoms.length||!shoes.length) return [];
+  const rnd=mulberry(Math.floor(seed*1e9)); const out=[];
+  const outerOpts=pin&&CATS[pin.cat]?.slot==="outer"?outers:[null,...outers];
+  const accOpts=pin&&CATS[pin.cat]?.slot==="acc"?accs:[null,...accs];
+  for(const t of tops)for(const b of bottoms)for(const sh of shoes)for(const o of outerOpts){
+    const parts=[t,o,b,sh]; let sc=scoreLook(parts,style)+rnd()*1.6;
+    let a=accOpts[Math.floor(rnd()*accOpts.length)]||null; if(a&&compat(a,t)<0)a=null;
+    out.push({parts:[t,o,b,sh,a],sc});
+  }
+  out.sort((x,y)=>y.sc-x.sc);
+  const res=[],used=new Set();
+  for(const o of out){const key=o.parts[0].id+o.parts[2].id; const k2=o.parts[0].id+o.parts[3].id;
+    if(used.has(key)||used.has(k2))continue; used.add(key);used.add(k2);res.push(o); if(res.length>=count)break;}
+  return res.map((o,i)=>({id:"g"+i+"_"+Math.random().toString(36).slice(2,7),name:lookName(o.parts,style),style:style==="all"?bestStyle(o.parts):style,itemIds:o.parts.filter(Boolean).map(p=>p.id),generated:true}));
+}
+function bestStyle(parts){const c={};parts.filter(Boolean).forEach(p=>(p.styles||[]).forEach(s=>c[s]=(c[s]||0)+1));
+  return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0]||"casual"}
+function lookName(parts,style){const st=STYLE_RU[style==="all"?bestStyle(parts):style]||"Образ";
+  const t=parts[1]||parts[0]; return `${st}: ${(t.name||"").toLowerCase()}`}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+function picksFor({item=null,style="all",outfit=null,limit=4}={}){
+  let have=new Set(S.items.map(i=>CATS[i.cat]?.slot+":"+i.color));
+  let list=PICKS.map(p=>{let s=0;
+    if(style!=="all") s+=p.styles.includes(style)?3:-3;
+    if(item){const sl=CATS[item.cat]?.slot, psl=CATS[p.cat]?.slot; if(sl===psl) s-=4; else s+=1;
+      s+=p.styles.filter(x=>(item.styles||[]).includes(x)).length; s+=compat(item,p)>0?1:-2;}
+    if(outfit){const parts=outfit.itemIds.map(byId).filter(Boolean); const slots=new Set(parts.map(x=>CATS[x.cat]?.slot));
+      const psl=CATS[p.cat]?.slot; if(!slots.has(psl)) s+=2; else s-=1;
+      s+=p.styles.includes(outfit.style)?2:0; s+=parts.every(x=>compat(x,p)>=0)?1:-2;}
+    if(have.has(CATS[p.cat]?.slot+":"+p.color)) s-=2;
+    return {p,s}});
+  return list.sort((a,b)=>b.s-a.s).slice(0,limit).map(x=>x.p);
+}
+
+/* ---------- try-on photos for item combinations ----------
+   Combos the look generator shows most, each with a generated «на мне» photo at tryon/<file>.jpg.
+   Key = owned item ids without the my_ prefix, sorted, joined with "+". */
+const COMBOS=[
+  ["biker+ecru_tr+morato+rib_tank",["casual"],"c_biker-ecru_tr-morato-rib_tank"],
+  ["biker+cream_tr+maag_check+navy_sneak",["casual"],"c_biker-cream_tr-maag_check-navy_sneak"],
+  ["biker+maag_jeans+maag_print+morato",["casual"],"c_biker-maag_jeans-maag_print-morato"],
+  ["biker+ecru_tr+grey_tee+morato",["casual"],"c_biker-ecru_tr-grey_tee-morato"],
+  ["biker+cream_tr+maag_knitshirt+navy_sneak",["casual"],"c_biker-cream_tr-maag_knitshirt-navy_sneak"],
+  ["biker+maag_jeans+rib_tank+run_sneak",["casual"],"c_biker-maag_jeans-rib_tank-run_sneak"],
+  ["biker+cream_tr+navy_sneak+rib_tank",["casual"],"c_biker-cream_tr-navy_sneak-rib_tank"],
+  ["biker+cream_tr+maag_knitshirt+morato",["casual"],"c_biker-cream_tr-maag_knitshirt-morato"],
+  ["cream_tr+navy_sneak+zara_tee",["minimal", "smart"],"my_look11"],
+  ["cream_tr+maag_knitshirt+navy_sneak",["smart"],"c_cream_tr-maag_knitshirt-navy_sneak"],
+  ["cream_tr+lime_tee+morato",["smart"],"c_cream_tr-lime_tee-morato"],
+  ["ecru_tr+maag_knitshirt+morato",["oldmoney", "smart"],"c_ecru_tr-maag_knitshirt-morato"],
+  ["cream_tr+ecru_zip+morato",["smart"],"c_cream_tr-ecru_zip-morato"],
+  ["ecru_tr+lime_linen+morato",["oldmoney", "smart"],"c_ecru_tr-lime_linen-morato"],
+  ["biker+maag_jeans+maag_print+timberland",["street"],"c_biker-maag_jeans-maag_print-timberland"],
+  ["biker+cream_hoodie+maag_jeans+timberland",["street"],"c_biker-cream_hoodie-maag_jeans-timberland"],
+  ["biker+maag_jeans+matrona_hoodie+timberland",["street"],"c_biker-maag_jeans-matrona_hoodie-timberland"],
+  ["biker+hdn_tee+maag_jeans+timberland",["street"],"my_look18"],
+  ["cream_tr+maag_tank+morato",["oldmoney"],"c_cream_tr-maag_tank-morato"],
+  ["cream_tr+maag_knitshirt+morato",["oldmoney"],"c_cream_tr-maag_knitshirt-morato"],
+  ["ecru_tr+maag_tank+morato",["oldmoney"],"my_look5"],
+  ["cream_tr+navy_sneak+rib_tank",["minimal"],"c_cream_tr-navy_sneak-rib_tank"],
+  ["cream_tr+hdn_tee+navy_sneak",["minimal"],"c_cream_tr-hdn_tee-navy_sneak"],
+  ["cream_tr+maag_tank+navy_sneak",["minimal"],"c_cream_tr-maag_tank-navy_sneak"],
+  ["cream_tr+grey_tee+navy_sneak",["minimal"],"c_cream_tr-grey_tee-navy_sneak"],
+  ["ecru_tr+rib_tank+run_sneak",["sport"],"c_ecru_tr-rib_tank-run_sneak"],
+  ["ecru_tr+matrona_hoodie+run_sneak",["sport"],"c_ecru_tr-matrona_hoodie-run_sneak"],
+  ["maag_jeans+matrona_hoodie+run_sneak",["sport"],"c_maag_jeans-matrona_hoodie-run_sneak"],
+  ["maag_jeans+rib_tank+run_sneak",["sport"],"c_maag_jeans-rib_tank-run_sneak"]
+];
+const comboKey=ids=>ids.map(x=>x.replace(/^my_/,"")).sort().join("+");
+function tryonOf(o){
+  if(/^my_look/.test(o.id)) return `tryon/${o.id}.jpg`;
+  if((o.buy||[]).length) return null;
+  const c=COMBOS.find(c=>c[0]===comboKey(o.itemIds));
+  return c?`tryon/${c[2]}.jpg`:null;
+}
+/* Looks for «Собрать образ» / «Стили»: only combos that have a photo; the random generator is the fallback. */
+function photoLooks(style,count=4,shuffle=false){
+  let list=COMBOS.filter(c=>c[1].includes(style)).map(c=>({id:"c_"+c[0],style,itemIds:c[0].split("+").map(x=>"my_"+x),generated:true}))
+    .filter(o=>o.itemIds.every(byId));
+  if(shuffle) list=list.map(o=>[Math.random(),o]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+  if(list.length<2) return generate({style,count});
+  return list.slice(0,count);
+}
+
+/* ---------- rendering ---------- */
+function setTab(t){S.tab=t;try{localStorage.setItem("wr_tab",t)}catch(e){}
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"true":"false"));render();window.scrollTo(0,0)}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+function render(){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===S.tab?"true":"false"));
+  if(S.tab==="wardrobe")renderWardrobe(); else if(S.tab==="looks")renderLooks(); else if(S.tab==="styles")renderStyles(); else if(S.tab==="icons")renderIcons(); else renderShop();
+}
+function itemCard(i){
+  return `<button class="item" data-open="${esc(i.id)}"><div class="pic">${art(i)}</div>
+    <span class="nm">${esc(i.name)}</span>
+    <span class="row" style="gap:4px"><span class="tag">${esc(CATS[i.cat]?.ru||i.cat)}</span>${i.size?`<span class="tag ex">${esc(i.size)}</span>`:""}${i.example?'<span class="tag ex">пример</span>':""}</span></button>`;
+}
+function renderWardrobe(){
+  const cats=Object.keys(CATS).filter(c=>S.items.some(i=>i.cat===c));
+  const shown=S.items.filter(i=>(S.cat==="all"||i.cat===S.cat)&&(S.style==="all"||(i.styles||[]).includes(S.style))).sort((a,b)=>(a.example?1:0)-(b.example?1:0));
+  const colorCount={}; S.items.forEach(i=>colorCount[i.color]=(colorCount[i.color]||0)+1);
+  const examples=S.items.some(i=>i.example), mine=S.items.filter(i=>!i.example).length;
+  $view.innerHTML=`
+    ${examples?`<p class="lead" style="margin-top:16px">${mine?`Твоих вещей: ${mine}, они идут первыми. Вещи с пометкой «пример» пока закрывают то, чего нет на фото (например, обувь). Пришли ещё фото в чат, и я заменю примеры.`:`Сейчас здесь примеры вещей с рисунками-заглушками. Добавь свои фото через «+&nbsp;Вещь» или пришли их в чат, я заменю примеры сам.`}</p>`:""}
+    <h2 class="sec">Цвета гардероба</h2>
+    <div class="palette">${Object.entries(colorCount).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<span class="swatch"><i style="background:${(COLORS[c]||COLORS.grey).hex}"></i>${esc((COLORS[c]||{ru:c}).ru)} · ${n}</span>`).join("")||'<span class="note">Появятся, когда добавишь вещи</span>'}</div>
+    <h2 class="sec">Вещи <span class="count">${shown.length} из ${S.items.length}</span>
+      <span style="margin-left:auto" class="row"><button class="btn small" id="addItem" ${S.db?"":"disabled"}>+ Вещь</button></span></h2>
+    <div class="row" style="margin-bottom:8px">${chip("cat","all","Все")}${cats.map(c=>chip("cat",c,CATS[c].ru)).join("")}</div>
+    <div class="row" style="margin-bottom:14px">${chip("style","all","Любой стиль")}${STYLES.map(s=>chip("style",s.id,s.ru)).join("")}</div>
+    ${shown.length?`<div class="grid">${shown.map(itemCard).join("")}</div>`:
+      `<div class="empty">${S.loaded?(S.items.length?"В этом фильтре пусто.":"Гардероб пока пуст. Нажми «+ Вещь» и загрузи фото первой вещи."):"Загружаю гардероб…"}</div>`}
+    ${S.db||document.body.classList.contains("static")?"":`<p class="note" style="margin-top:12px">${S.loaded?"Хранилище недоступно в этом окне: открой страницу в claude.ai под своим аккаунтом, чтобы видеть и сохранять вещи.":""}</p>`}`;
+  bindChips(); bindOpen();
+  const a=document.getElementById("addItem"); if(a)a.onclick=()=>openForm();
+}
+function chip(group,val,label){const cur=group==="cat"?S.cat:group==="style"?S.style:group==="shopStore"?S.shopStore:S.shopStyle;
+  return `<button class="chip" data-g="${group}" data-v="${val}" aria-pressed="${cur===val}">${esc(label)}</button>`}
+function bindChips(){document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{S[b.dataset.g]=b.dataset.v;render()})}
+function bindOpen(root=document){root.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openItem(b.dataset.open))}
+
+function lookCard(o,n){
+  const parts=o.itemIds.map(byId).filter(Boolean);
+  if(!parts.length) return "";
+  const order=["outer","top","bottom","shoes","acc"];
+  const sorted=[...parts].sort((a,b)=>order.indexOf(CATS[a.cat]?.slot)-order.indexOf(CATS[b.cat]?.slot));
+  /* o.buy: shop items to add to the look, {name,store,price,url,img} */
+  const tiles=[...sorted.map(p=>art(p)),...(o.buy||[]).filter(b=>b.img).map(b=>`<img src="${esc(b.img)}" alt="${esc(b.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`)];
+  const cells=tiles.map((t,i)=>`<div class="cell${tiles.length%2===1&&i===tiles.length-1?" wide":""}">${t}</div>`).join("");
+  /* a look with a try-on photo shows it by default, with a «На мне / Вещи» toggle; the board shows if the photo is missing */
+  const ph=tryonOf(o), view=(S.lookView||{})[o.id]??"me";
+  const board=ph
+    ?`<div class="seg" role="group" aria-label="Вид" style="margin-bottom:8px;width:max-content"><button data-lv="${esc(o.id)}" data-v="me" aria-pressed="${view==="me"}">На мне</button><button data-lv="${esc(o.id)}" data-v="items" aria-pressed="${view!=="me"}">Вещи</button></div>
+      <div class="me"${view==="me"?"":" hidden"}><img src="${esc(ph)}" alt="Этот образ на тебе" loading="lazy" onerror="const b=this.parentNode.nextElementSibling;b.hidden=false;this.parentNode.previousElementSibling.remove();this.parentNode.remove()"></div><div class="board"${view==="me"?" hidden":""}>${cells}</div>`
+    :`<div class="board">${cells}</div>`;
+  return `<article class="look">
+    <div>${board}</div>
+    <div style="min-width:0">
+      <div class="num">LOOK ${String(n).padStart(2,"0")}</div>
+      <h3>${esc(STYLE_RU[o.style]||"Образ")}</h3>
+      <ul>${sorted.map(p=>`<li><a href="#" data-open="${esc(p.id)}" style="color:inherit">${esc(p.name)}</a></li>`).join("")}</ul>
+      ${(o.buy||[]).length?`<div class="bl">Докупить</div><ul class="tobuy">${o.buy.map(b=>`<li>${b.img?`<img src="${esc(b.img)}" alt="" loading="lazy">`:"<span></span>"}<span>${esc(b.name)}<small>${esc(b.store||"")}${b.price?` · ${b.price} ₾`:""}</small>${b.url?`<a class="go" href="${esc(b.url)}" target="_blank" rel="noopener">Открыть ↗</a>`:""}</span></li>`).join("")}</ul>`:""}
+      ${o.why?`<div class="why">${esc(o.why)}</div>`:""}
+      <div class="acts">
+        ${o.generated?`<button class="btn small" data-save="${esc(o.id)}" ${S.db?"":"disabled"}>Сохранить</button>`:`<button class="btn small ghost" data-del-look="${esc(o.id)}">Удалить</button>`}
+        <button class="btn small ghost" data-buy-look="${esc(o.id)}">Что докупить</button>
+      </div>
+    </div></article>`;
+}
+function bindLooks(pool){
+  document.querySelectorAll("[data-open]").forEach(a=>a.onclick=e=>{e.preventDefault();openItem(a.dataset.open)});
+  document.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{S.lookView={...(S.lookView||{}),[b.dataset.lv]:b.dataset.v};
+    const card=b.closest(".look"),me=card.querySelector(".me"),bd=card.querySelector(".board");if(me)me.hidden=b.dataset.v!=="me";if(bd)bd.hidden=b.dataset.v==="me";
+    card.querySelectorAll("[data-lv]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+  document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>saveLook(pool.find(o=>o.id===b.dataset.save),b));
+  document.querySelectorAll("[data-del-look]").forEach(b=>b.onclick=()=>confirmInline(b,"Удалить образ?",()=>S.db.doc("outfits/"+b.dataset.delLook).delete().then(()=>toast("Образ удалён"))));
+  document.querySelectorAll("[data-buy-look]").forEach(b=>b.onclick=()=>{const o=pool.find(x=>x.id===b.dataset.buyLook)||S.outfits.find(x=>x.id===b.dataset.buyLook);openBuy(o)});
+}
+function renderLooks(){
+  const saved=S.outfits.filter(o=>S.style==="all"||o.style===S.style).sort((a,b)=>(/^my_/.test(b.id)?1:0)-(/^my_/.test(a.id)?1:0));
+  if(!S.gen.length&&S.items.length) S.gen=photoLooks(S.genStyle);
+  $view.innerHTML=`
+    <h2 class="sec">Собрать образ</h2>
+    <div class="row" style="margin-bottom:10px">${STYLES.map(s=>`<button class="chip" data-gs="${s.id}" aria-pressed="${S.genStyle===s.id}">${s.ru}</button>`).join("")}</div>
+    <div class="row" style="margin-bottom:12px"><button class="btn" id="regen">Подобрать ещё</button><button class="btn ghost" id="manual" ${S.db?"":"disabled"}>Собрать вручную</button></div>
+    ${S.gen.length?`<div class="looks">${S.gen.map((o,i)=>lookCard(o,i+1)).join("")}</div>`:`<div class="empty">Для образа нужны хотя бы верх, низ и обувь.</div>`}
+    ${aiBlock()}
+    <h2 class="sec">Мои образы <span class="count">${saved.length}</span></h2>
+    <div class="row" style="margin-bottom:12px">${chip("style","all","Все стили")}${STYLES.map(s=>chip("style",s.id,s.ru)).join("")}</div>
+    ${saved.length?`<div class="looks">${saved.map((o,i)=>lookCard(o,i+1)).join("")}</div>`:`<div class="empty">Сохранённых образов пока нет. Нажми «Сохранить» под понравившимся.</div>`}`;
+  bindChips(); bindLooks([...S.gen,...S.outfits]); bindAi();
+  document.querySelectorAll("[data-gs]").forEach(b=>b.onclick=()=>{S.genStyle=b.dataset.gs;S.gen=photoLooks(S.genStyle);render()});
+  document.getElementById("regen").onclick=()=>{S.gen=photoLooks(S.genStyle,4,true);render()};
+  document.getElementById("manual").onclick=()=>openBuilder();
+}
+function renderStyles(){
+  const cur=S.styleSel||"casual"; const st=STYLES.find(s=>s.id===cur);
+  const looks=photoLooks(cur);
+  const mine=S.items.filter(i=>(i.styles||[]).includes(cur));
+  $view.innerHTML=`
+    <h2 class="sec">Стили</h2>
+    <div class="styles">${STYLES.map(s=>`<button class="style" data-st="${s.id}" aria-pressed="${s.id===cur}">
+      <div class="dots">${s.dots.map(c=>`<i style="background:${COLORS[c].hex}"></i>`).join("")}</div>
+      <h3>${s.ru}</h3><p>${s.d}</p><span class="status">${S.items.filter(i=>(i.styles||[]).includes(s.id)).length} вещ. в гардеробе</span></button>`).join("")}</div>
+    <h2 class="sec">${esc(st.ru)}: образы из твоих вещей</h2>
+    ${looks.length?`<div class="looks">${looks.map((o,i)=>lookCard(o,i+1)).join("")}</div>`:`<div class="empty">Пока не хватает вещей с пометкой «${esc(st.ru)}». Ниже то, с чего стоит начать.</div>`}
+    <h2 class="sec">Чего не хватает для стиля «${esc(st.ru)}»</h2>
+    <div class="picks">${picksFor({style:cur,limit:4}).map(pickCard).join("")}</div>
+    <h2 class="sec">Вещи этого стиля <span class="count">${mine.length}</span></h2>
+    ${mine.length?`<div class="grid">${mine.map(itemCard).join("")}</div>`:`<div class="empty">Нет вещей с этим стилем.</div>`}`;
+  document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{S.styleSel=b.dataset.st;render()});
+  bindLooks(looks); bindOpen();
+}
+function pickCard(p){
+  return `<article class="pick"><div class="pic">${art({cat:p.cat,color:p.color})}</div><div style="min-width:0">
+    <h4>${esc(p.ru)}</h4><p>${esc(p.why)}</p>
+    <div class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</div></div></article>`;
+}
+function renderShop(){
+  const list=PICKS.filter(p=>(S.shopStore==="all"||p.st.includes(S.shopStore))&&(S.shopStyle==="all"||p.styles.includes(S.shopStyle)));
+  $view.innerHTML=`
+    <h2 class="sec">Докупить: тренды осень–зима 2026</h2>
+    <p class="lead">Подборка стилиста под мужской гардероб. Ссылки ведут в грузинские магазины. Наличие и цену в лари смотри на сайте: ассортимент меняется каждую неделю.</p>
+    <div class="row" style="margin:14px 0 8px">${chip("shopStore","all","Все магазины")}${Object.entries(STORES).map(([k,s])=>chip("shopStore",k,s.ru)).join("")}</div>
+    <div class="row" style="margin-bottom:14px">${chip("shopStyle","all","Любой стиль")}${STYLES.map(s=>chip("shopStyle",s.id,s.ru)).join("")}</div>
+    ${list.length?`<div class="picks">${list.map(pickCard).join("")}</div>`:`<div class="empty">Ничего не нашлось под эти фильтры.</div>`}`;
+  bindChips();
+}
+
+/* ---------- style icons ---------- */
+const FIT_NOTE="Подобрано под твой крой: широкий низ и приталенная футболка, заправленная в брюки.";
+const ICONS=[
+ {id:"kaladze",ru:"Каха Каладзе",sub:"Мэр Тбилиси, экс-защитник «Милана»",ig:"https://www.instagram.com/kakhakaladze/",
+  dots:["navy","white","black","sky","brown","beige"],
+  traits:["На официальных встречах: тёмно-синий костюм, белая или голубая рубашка, тёмный галстук.",
+    "Фирменная вещь: стёганый тёмно-синий жилет поверх белой рубашки, с широкими джинсами.",
+    "Без галстука: тёмно-синий двубортный блейзер и широкие бежевые брюки.",
+    "В городе: всё чёрное, техническая ветровка и очень широкие варёные джинсы.",
+    "Почти всегда тёмные очки-авиаторы. Цвета: синий, белый, чёрный, коричневая замша."],
+  looks:[
+   {name:"Официальная встреча",items:[
+     {ru:"Тёмно-синий костюмный пиджак",cat:"blazer",color:"navy",q:"navy suit blazer",st:["zara","md"]},
+     {ru:"Белая рубашка slim fit",cat:"shirt",color:"white",q:"slim fit white shirt",st:["md","zara","hm"]},
+     {ru:"Костюмные брюки свободного кроя, тёмно-синие",cat:"trousers",color:"navy",q:"relaxed fit suit trousers navy",st:["zara","md"]},
+     {ru:"Чёрные кожаные дерби",cat:"shoes",color:"black",q:"leather derby shoes",st:["zara","md"]}],
+    tip:"Галстук тёмно-синий, однотонный или в мелкий рисунок."},
+   {name:"Жилет поверх рубашки",items:[
+     {ru:"Стёганый жилет тёмно-синий",cat:"vest",color:"navy",q:"quilted gilet",st:["md","zara","hm","pb"]},
+     {ru:"Белая оксфорд-рубашка",cat:"shirt",color:"white",q:"oxford shirt white",st:["md","zara","hm"]},
+     {ru:"Широкие джинсы серого варёного цвета",cat:"jeans",color:"grey",q:"wide leg washed jeans grey",st:["pb","bershka","zara"]},
+     {ru:"Белые кожаные кеды",cat:"sneakers",color:"white",q:"white leather sneakers",st:["zara","md","hm"]},
+     {ru:"Очки-авиаторы",cat:"glasses",color:"black",q:"aviator sunglasses",st:["zara","pb","bershka"]}],
+    tip:"Рукава рубашки закатай на пару оборотов, как у него."},
+   {name:"Блейзер без галстука",items:[
+     {ru:"Двубортный блейзер тёмно-синий",cat:"blazer",color:"navy",q:"double breasted blazer navy",st:["md","zara"]},
+     {ru:"Белая рубашка, ворот расстёгнут",cat:"shirt",color:"white",q:"white shirt",st:["md","zara","hm"]},
+     {ru:"Широкие брюки со стрелками, бежевые",cat:"trousers",color:"beige",q:"wide leg pleated trousers beige",st:["zara","md","hm"]},
+     {ru:"Замшевые лоферы",cat:"shoes",color:"brown",q:"suede loafers",st:["zara","md"]}],
+    tip:"Платок в нагрудный карман добавит его фирменную деталь."},
+   {name:"Всё чёрное в городе",items:[
+     {ru:"Чёрная техническая ветровка",cat:"outer",color:"black",q:"technical jacket black",st:["pb","bershka","zara","hm"]},
+     {ru:"Чёрная футболка slim fit",cat:"tee",color:"black",q:"slim fit t-shirt black",st:["zara","hm","pb"]},
+     {ru:"Широкие чёрные варёные джинсы",cat:"jeans",color:"black",q:"baggy jeans black washed",st:["pb","bershka","zara"]},
+     {ru:"Белые кроссовки",cat:"sneakers",color:"white",q:"white sneakers",st:["zara","pb","bershka","hm"]},
+     {ru:"Тёмные очки",cat:"glasses",color:"black",q:"sunglasses",st:["zara","pb","bershka"]}],
+    tip:"Футболку заправь, ветровку оставь расстёгнутой."},
+   {name:"Замша и деним",items:[
+     {ru:"Коричневая замшевая куртка",cat:"outer",color:"brown",q:"suede jacket",st:["zara","md","pb"]},
+     {ru:"Серая футболка slim fit",cat:"tee",color:"grey",q:"slim fit t-shirt grey",st:["zara","hm","md"]},
+     {ru:"Светлые широкие джинсы",cat:"jeans",color:"lightdenim",q:"wide leg jeans light blue",st:["pb","bershka","zara","hm"]},
+     {ru:"Тёмные замшевые ботинки",cat:"boots",color:"brown",q:"suede boots",st:["zara","md"]}],
+    tip:"Так он ходит на выходных и на авто-встречах."},
+   {name:"Лето и выходные",items:[
+     {ru:"Джинсовая рубашка, носить расстёгнутой",cat:"shirt",color:"denim",q:"denim shirt",st:["zara","pb","hm","md"]},
+     {ru:"Белая майка или футболка",cat:"tee",color:"white",q:"slim fit tank top white",st:["zara","hm","pb"]},
+     {ru:"Широкие льняные брюки, молочные",cat:"trousers",color:"cream",q:"linen wide trousers",st:["zara","md","hm"]},
+     {ru:"Замшевые лоферы",cat:"shoes",color:"brown",q:"suede loafers",st:["zara","md"]}],
+    tip:"Летом он часто носит шорты чинос, но под твой крой лучше широкие лёгкие брюки."}
+  ]},
+ {id:"loropiana",ru:"Loro Piana",sub:"Итальянский дом кашемира, эталон тихой роскоши",ig:"https://www.instagram.com/loropiana/",
+  dots:["cream","beige","camel","taupe","navy","brown"],
+  traits:["Нет логотипов. Дорого выглядит ткань и крой, а не бренд.",
+    "Кашемир и мериносовая шерсть: свитер на молнии, поло, водолазка.",
+    "Замша: бомбер, лоферы без задника, ботинки-челси.",
+    "Палитра: молочный, бежевый, кэмел, серо-бежевый, тёмно-синий. Почти монохром.",
+    "Свободные брюки со стрелкой, мягкие ткани, всё не в обтяжку, но аккуратно.",
+    "В масс-маркете ближе всего Massimo Dutti, затем Zara и линия premium в H&M. Pull&Bear и Bershka для этого стиля почти не подходят."],
+  looks:[
+   {name:"Кашемировый уикенд",items:[
+     {ru:"Свитер на молнии (quarter-zip), кэмел",cat:"knit",color:"camel",q:"cashmere quarter zip sweater",st:["md","zara","hm"]},
+     {ru:"Белая футболка slim fit под него",cat:"tee",color:"white",q:"slim fit t-shirt",st:["md","zara","hm"]},
+     {ru:"Широкие брюки со стрелками, молочные",cat:"trousers",color:"cream",q:"wide leg pleated trousers",st:["md","zara"]},
+     {ru:"Замшевые лоферы",cat:"shoes",color:"brown",q:"suede loafers",st:["md","zara"]}]},
+   {name:"Замшевый бомбер",items:[
+     {ru:"Замшевый бомбер серо-бежевый",cat:"outer",color:"taupe",q:"suede bomber jacket",st:["md","zara"]},
+     {ru:"Трикотажное поло тёмно-синее",cat:"knit",color:"navy",q:"knit polo",st:["md","zara","hm"]},
+     {ru:"Широкие шерстяные брюки, серые",cat:"trousers",color:"grey",q:"wool wide leg trousers",st:["md","zara"]},
+     {ru:"Замшевые ботинки челси",cat:"boots",color:"brown",q:"suede chelsea boots",st:["md","zara"]}]},
+   {name:"Молочный монохром",items:[
+     {ru:"Свитер с круглым вырезом, молочный",cat:"knit",color:"cream",q:"cashmere crew neck sweater",st:["md","hm","zara"]},
+     {ru:"Широкие брюки, молочные",cat:"trousers",color:"cream",q:"relaxed fit trousers cream",st:["md","zara"]},
+     {ru:"Замшевые лоферы песочные",cat:"shoes",color:"sand",q:"suede loafers",st:["md","zara"]},
+     {ru:"Бежевая кепка",cat:"acc",color:"beige",q:"cap beige",st:["md","zara","hm"]}]},
+   {name:"Тёплое пальто",items:[
+     {ru:"Пальто из шерсти, кэмел",cat:"outer",color:"camel",q:"wool coat camel",st:["md","zara","hm"]},
+     {ru:"Водолазка серо-бежевая",cat:"knit",color:"taupe",q:"merino roll neck sweater",st:["md","zara","hm"]},
+     {ru:"Широкие брюки, тёмно-серые",cat:"trousers",color:"charcoal",q:"wide leg wool trousers",st:["md","zara"]},
+     {ru:"Замшевые ботинки",cat:"boots",color:"brown",q:"suede boots",st:["md","zara"]}]},
+   {name:"Лён летом",items:[
+     {ru:"Льняная рубашка, песочная",cat:"shirt",color:"sand",q:"linen shirt",st:["md","zara","hm"]},
+     {ru:"Широкие льняные брюки, молочные",cat:"trousers",color:"cream",q:"linen trousers",st:["md","zara","hm"]},
+     {ru:"Замшевые лоферы",cat:"shoes",color:"brown",q:"suede loafers",st:["md","zara"]}]}
+  ]}
+];
+function iconLook(l,n,iconId){
+  const order=["outer","top","bottom","shoes","acc"];
+  const sorted=[...l.items].sort((a,b)=>order.indexOf(CATS[a.cat]?.slot)-order.indexOf(CATS[b.cat]?.slot));
+  const cells=sorted.map((p,i)=>`<div class="cell${sorted.length%2===1&&i===sorted.length-1?" wide":""}">${art(p)}</div>`).join("");
+  const key="icon_"+iconId+n;
+  const mode=(S.capModel&&S.capModel[key]!=null)?S.capModel[key]:2;
+  /* tryon/icon_<icon><n>.jpg is generated separately; until it exists the scheme is shown */
+  const board=mode===2
+    ?`<div class="me"><img src="tryon/${key}.jpg" alt="Этот образ на тебе" loading="lazy" onerror="this.parentNode.nextElementSibling.hidden=false;this.parentNode.remove()"></div><div class="board" hidden>${cells}</div>`
+    :`<div class="board">${cells}</div>`;
+  return `<article class="look icon-look">${board}<div style="min-width:0">
+    <div class="seg" role="group" aria-label="Вид" style="margin-bottom:10px"><button data-cm="${key}" data-v="2" aria-pressed="${mode===2}">На мне</button><button data-cm="${key}" data-v="0" aria-pressed="${mode===0}">Схема</button></div>
+    <div class="num">LOOK ${String(n).padStart(2,"0")}</div><h3>${esc(l.name)}</h3>
+    <ul class="buy">${sorted.map(p=>{const own=S.items.find(i=>!i.example&&i.cat===p.cat&&i.color===p.color);
+      return `<li><span>${esc(p.ru)}</span>${own?`<span class="have">есть у тебя: ${esc(own.name)}</span>`:""}
+      <span class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</span></li>`}).join("")}</ul>
+    ${l.tip?`<div class="why">${esc(l.tip)}</div>`:""}</div></article>`;
+}
+/* Real products photographed from the Georgian store sites on 2026-10-21. c = product shot, m = on model. */
+const PRODUCTS={
+  k_blazer:{ru:"Блейзер из шерсти, тёмно-синий",store:"zara",price:179,was:379,url:"https://www.zara.com/ge/en/regular-fit-wool-blend-suit-blazer-p06406191.html",c:1,m:1},
+  k_gilet:{ru:"Пуховый жилет, тёмно-синий",store:"zara",price:219,url:"https://www.zara.com/ge/en/water-repellent-80-down-and-20-feather-gilet-p02634383.html",c:1,m:1},
+  k_shirt:{ru:"Оксфорд-рубашка, белая",store:"zara",price:109,url:"https://www.zara.com/ge/en/regular-fit-textured-oxford-shirt-p03277300.html",c:1,m:1,mnote:"на модели в голубую полоску"},
+  k_jacket:{ru:"Ветровка свободного кроя, чёрная",store:"zara",price:259,url:"https://www.zara.com/ge/en/water-repellent-relaxed-fit-jacket-p00155401.html?v1=549569917",c:1,m:1},
+  k_suede:{ru:"Замшевая куртка с карманами, коньячная",store:"zara",price:529,url:"https://www.zara.com/ge/en/leather-suede-jacket-with-pockets-p08281081.html?v1=556928096",c:1,m:1},
+  t_white:{ru:"Футболка slim fit, белая",store:"zara",price:39,url:"https://www.zara.com/ge/en/basic-slim-fit-t-shirt--01-p05584401.html?v1=545485813",m:1},
+  t_black:{ru:"Футболка slim fit, чёрная",store:"zara",price:39,url:"https://www.zara.com/ge/en/basic-slim-fit-t-shirt--01-p05584401.html?v1=545485807",m:1},
+  k_chino:{ru:"Широкие брюки со складками, светло-бежевые",store:"zara",price:219,url:"https://www.zara.com/ge/en/relaxed-fit-pleated-chino-trousers-p04015640.html",c:1,m:1},
+  k_jeans:{ru:"Широкие джинсы baggy, серо-коричневые",store:"zara",price:129,url:"https://www.zara.com/ge/en/baggy-fit-jeans-p06045495.html?v1=555480595",c:1,m:1},
+  k_sneak:{ru:"Кожаные кеды, белые",store:"zara",price:219,url:"https://www.zara.com/ge/en/leather-trainers-p12227720.html",c:1},
+  k_loafer:{ru:"Замшевые мокасины, табачные",store:"zara",price:219,url:"https://www.zara.com/ge/en/leather-deck-shoes-p12432720.html",c:1},
+  k_glasses:{ru:"Солнцезащитные очки, металл",store:"zara",price:219,url:"https://www.zara.com/ge/en/oval-sunglasses-p02750324.html",c:1},
+  l_polo_camel:{ru:"Кашемировое поло, горчично-кэмел",store:"md",price:900,url:"https://www.massimodutti.com/ge/en/100-cashmere-knit-polo-sweater-l01346215?pelement=61734323",m:1},
+  l_polo_cream:{ru:"Кашемировое поло, молочное",store:"md",price:760,url:"https://www.massimodutti.com/ge/en/100-cashmere-knit-polo-sweater-l01282215?pelement=62574247",m:1},
+  l_polo_taupe:{ru:"Кашемировое поло, серо-бежевое",store:"md",price:760,url:"https://www.massimodutti.com/ge/en/100-cashmere-knit-polo-sweater-l01282215?pelement=62574245",m:1},
+  l_polo_navy:{ru:"Кашемировое поло, тёмно-синее",store:"md",price:760,url:"https://www.massimodutti.com/ge/en/100-cashmere-knit-polo-sweater-l01282215?pelement=62574242",m:1},
+  l_suede:{ru:"Замшевая куртка с капюшоном, серо-бежевая",store:"zara",price:699,url:"https://www.zara.com/ge/en/suede-finish-leather-hooded-jacket-p00624404.html?v1=593935868",c:1,m:1},
+  l_coat:{ru:"Пальто из шерсти, кэмел",store:"zara",price:329,url:"https://www.zara.com/ge/en/relaxed-fit-wool-blend-coat-p08281615.html?v1=572182585",c:1,m:1},
+  l_cream_tr:{ru:"Широкие брюки хлопок-лён, молочные",store:"zara",price:179,url:"https://www.zara.com/ge/en/cotton-linen-pleated-chino-trousers-p00706777.html?v1=560807111",c:1,m:1},
+  l_grey_tr:{ru:"Широкие брюки со складками, графит",store:"zara",price:159,url:"https://www.zara.com/ge/en/relaxed-fit-pleated-chino-trousers-p06887452.html",c:1},
+  l_loafer:{ru:"Замшевые мокасины, песочные",store:"zara",price:219,url:"https://www.zara.com/ge/en/leather-deck-shoes-p12433820.html",c:1},
+  l_boots:{ru:"Замшевые челси, серо-коричневые",store:"zara",price:219,url:"https://www.zara.com/ge/en/leather-chelsea-boots-p12001820.html",c:1}
+};
+const CAPSULES={
+  kaladze:{lead:"Всё из Zara Тбилиси, 12 вещей. Из них собираются 5 образов, как у Каладзе.",
+    looks:[
+      {name:"Блейзер без галстука",ids:["k_blazer","k_shirt","k_chino","k_loafer"],tip:"Рубашку заправь в брюки, ворот расстегни."},
+      {name:"Жилет поверх рубашки",ids:["k_gilet","k_shirt","k_jeans","k_sneak","k_glasses"],tip:"Его фирменный образ. Рукава рубашки закатай."},
+      {name:"Всё чёрное в городе",ids:["k_jacket","t_black","k_jeans","k_sneak","k_glasses"],tip:"Футболку заправь, ветровку оставь расстёгнутой."},
+      {name:"Замшевая куртка",ids:["k_suede","t_white","k_jeans","k_loafer"],tip:"Белая футболка, заправленная в широкие джинсы."},
+      {name:"Тёплый день",ids:["t_white","k_chino","k_loafer","k_glasses"],tip:"Самый простой образ: slim-футболка, заправленная в широкие брюки."}
+    ]},
+  loropiana:{lead:"Кашемир из Massimo Dutti и замша, шерсть и брюки из Zara. 11 вещей, 5 образов.",
+    looks:[
+      {name:"Кашемировый уикенд",ids:["l_polo_camel","l_cream_tr","l_loafer"],tip:"Поло навыпуск, мокасины на босу ногу или с короткими носками."},
+      {name:"Молочный монохром",ids:["l_polo_cream","l_cream_tr","l_loafer"],tip:"Почти один цвет с головы до ног: главный приём Loro Piana."},
+      {name:"Замша и поло",ids:["l_suede","l_polo_navy","l_grey_tr","l_boots"],tip:"Серо-бежевая замша с тёмно-синим трикотажем."},
+      {name:"Пальто на зиму",ids:["l_coat","l_polo_taupe","l_grey_tr","l_boots"],tip:"Кэмел, серо-бежевый и графит без единого яркого пятна."},
+      {name:"Тихий кэжуал",ids:["l_suede","t_white","l_cream_tr","l_loafer"],tip:"Белая футболка заправлена в молочные брюки, сверху замша."}
+    ]}
+};
+/* Rodion: 176 cm, shoulders 50 cm, jeans EU 38–40, shoes EU 43. */
+const SIZE_OF=id=>{
+  if(/glasses/.test(id)) return "один размер";
+  if(/sneak|loafer|boots/.test(id)) return "43";
+  if(/jeans/.test(id)) return "EU 40 (W31)";
+  if(/_tr$|chino/.test(id)) return "EU 40";
+  if(/blazer/.test(id)) return "EU 50";
+  if(/^t_/.test(id)) return "L";
+  if(/polo/.test(id)) return "L";
+  return "L";
+};
+const imgOf=(id,kind)=>{const p=PRODUCTS[id];const k=kind==="m"?(p.m?"m":"c"):(p.c?"c":"m");return `shop/${id}_${k}.jpg`};
+const gel=n=>`${n.toLocaleString("ru-RU")} ₾`;
+function capLook(l,n,capId){
+  const mode=(S.capModel&&S.capModel[capId+n]!=null)?S.capModel[capId+n]:2;
+  const onModel=mode===1;
+  const ps=l.ids.map(id=>PRODUCTS[id]);
+  const total=ps.reduce((s,p)=>s+p.price,0);
+  const board=mode===2
+    ?`<div class="me"><img src="tryon/${capId}${n}.jpg" alt="Этот образ на тебе" loading="lazy"></div>`
+    :onModel
+    ?`<div class="mstrip">${l.ids.filter(id=>PRODUCTS[id].m).map(id=>`<img src="${imgOf(id,"m")}" alt="${esc(PRODUCTS[id].ru)} на модели" loading="lazy">`).join("")||'<span class="note">Нет фото на модели</span>'}</div>`
+    :`<div class="rboard n${l.ids.length}">${l.ids.map(id=>`<div class="cell"><img src="${imgOf(id,"c")}" alt="${esc(PRODUCTS[id].ru)}" loading="lazy"></div>`).join("")}</div>`;
+  return `<article class="caplook">
+    <div class="caphd"><div><div class="num">LOOK ${String(n).padStart(2,"0")}</div><h3>${esc(l.name)}</h3></div>
+      <div class="seg" role="group" aria-label="Вид"><button data-cm="${capId+n}" data-v="2" aria-pressed="${mode===2}">На мне</button><button data-cm="${capId+n}" data-v="1" aria-pressed="${mode===1}">На модели</button><button data-cm="${capId+n}" data-v="0" aria-pressed="${mode===0}">Вещи</button></div></div>
+    ${board}
+    <ul class="plist">${l.ids.map(id=>{const p=PRODUCTS[id];return `<li><img src="${imgOf(id,"c")}" alt="" loading="lazy"><span class="pn">${esc(p.ru)}<small>${STORES[p.store].ru} · твой размер ${SIZE_OF(id)}${p.mnote&&onModel?` · ${esc(p.mnote)}`:""}</small></span>
+      <span class="pp">${p.was?`<s>${gel(p.was)}</s>`:""}${gel(p.price)}</span><a class="buy" href="${p.url}" target="_blank" rel="noopener" aria-label="Открыть ${esc(p.ru)} в магазине">Открыть ↗</a></li>`}).join("")}</ul>
+    <div class="captot"><span>${esc(l.tip)}</span><b>Итого ${gel(total)}</b></div></article>`;
+}
+function capsuleBlock(capId){
+  const cap=CAPSULES[capId]; if(!cap) return "";
+  const ids=[...new Set(cap.looks.flatMap(l=>l.ids))];
+  const total=ids.reduce((s,id)=>s+PRODUCTS[id].price,0);
+  return `<h2 class="sec">Капсула из магазинов <span class="count">${ids.length} вещей · ${gel(total)}</span></h2>
+    <p class="lead">${esc(cap.lead)} Фото и цены сняты с сайтов магазинов 21 октября 2026, наличие может меняться. «На мне» показывает образ на тебе (сгенерировано по твоему фото, крой и цвет близки к оригиналу, но это не фотография). «На модели» показывает, как сидит каждая вещь. Размеры подобраны под 176 см, плечи 50 см, джинсы 38–40, обувь 43.</p>
+    <div class="caplooks">${cap.looks.map((l,i)=>capLook(l,i+1,capId)).join("")}</div>
+    <h2 class="sec">Все вещи капсулы</h2>
+    <div class="grid">${ids.map(id=>{const p=PRODUCTS[id];return `<a class="item prod" href="${p.url}" target="_blank" rel="noopener">
+      <div class="pic real"><img src="${imgOf(id,"m")}" alt="${esc(p.ru)}" loading="lazy"></div>
+      <span class="nm">${esc(p.ru)}</span><span class="row" style="gap:6px;justify-content:space-between"><span class="tag">${STORES[p.store].ru}</span><b class="pr">${gel(p.price)}</b></span></a>`}).join("")}</div>`;
+}
+function renderIcons(){
+  const cur=ICONS.find(i=>i.id===S.icon)||ICONS[0];
+  $view.innerHTML=`
+    <h2 class="sec">Иконы стиля</h2>
+    <div class="row" style="margin-bottom:14px">${ICONS.map(i=>`<button class="chip" data-icon="${i.id}" aria-pressed="${i.id===cur.id}">${esc(i.ru)}</button>`).join("")}</div>
+    <section class="icon-hd">
+      <div><h3>${esc(cur.ru)}</h3><p class="note">${esc(cur.sub)} · <a href="${cur.ig}" target="_blank" rel="noopener" style="color:inherit">Instagram ↗</a></p>
+        <div class="dots" style="margin:8px 0">${cur.dots.map(c=>`<i style="background:${COLORS[c].hex}"></i>`).join("")}</div></div>
+      <ul class="traits">${cur.traits.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+    </section>
+    <p class="fit">${FIT_NOTE}</p>
+    ${capsuleBlock(cur.id)}
+    <h2 class="sec">Ещё идеи под этот стиль <span class="count">${cur.looks.length}</span></h2>
+    <p class="lead">Схемы образов с поиском похожих вещей в пяти магазинах.</p>
+    <div class="looks wide" style="margin-top:12px">${cur.looks.map((l,i)=>iconLook(l,i+1,cur.id)).join("")}</div>`;
+  document.querySelectorAll("[data-icon]").forEach(b=>b.onclick=()=>{S.icon=b.dataset.icon;try{localStorage.setItem("wr_icon",S.icon)}catch(e){}render()});
+  document.querySelectorAll("[data-cm]").forEach(b=>b.onclick=()=>{S.capModel=S.capModel||{};S.capModel[b.dataset.cm]=Number(b.dataset.v);const y=window.scrollY;render();window.scrollTo(0,y)});
+}
+try{const ic=localStorage.getItem("wr_icon"); if(ic) S.icon=ic;}catch(e){}
+{const h=(location.hash||"").slice(1); if(ICONS.some(i=>i.id===h)){S.tab="icons";S.icon=h} else if(["wardrobe","looks","styles","shop","icons"].includes(h)) S.tab=h;}
+
+/* ---------- AI stylist ---------- */
+function aiBlock(){
+  if(S.sample===null) return "";
+  return `<h2 class="sec">Спросить стилиста</h2>
+  <div class="ai"><label for="aiq" class="note">Например: «куда-то на ужин в пятницу», «собери 3 образа с серым худи», «что купить в Zara до 300 лари».</label>
+    <textarea id="aiq" placeholder="Опиши повод или вопрос"></textarea>
+    <div class="row"><button class="btn" id="aiGo">Спросить</button><span class="status" id="aiSt"></span></div>
+    <div id="aiOut"></div></div>`;
+}
+function bindAi(){
+  const go=document.getElementById("aiGo"); if(!go)return;
+  go.onclick=async()=>{
+    const q=document.getElementById("aiq").value.trim(); if(!q){toast("Напиши вопрос");return}
+    const st=document.getElementById("aiSt"), out=document.getElementById("aiOut");
+    const sample=S.sample||await claude.use("sample"); if(!sample){st.textContent="Стилист недоступен в этом окне";return}
+    go.disabled=true; st.textContent="Думаю…";
+    const wardrobe=S.items.map(i=>({id:i.id,name:i.name,cat:CATS[i.cat]?.ru,color:(COLORS[i.color]||{}).ru,styles:i.styles}));
+    const picks=PICKS.map(p=>({id:p.id,name:p.ru,stores:p.st.map(s=>STORES[s].ru)}));
+    const prompt=`Ты мужской стилист. Город: Тбилиси, сезон: осень-зима 2026. Отвечай по-русски, коротко и по делу.
+Гардероб (JSON): ${JSON.stringify(wardrobe)}
+Каталог трендовых вещей для покупки (JSON): ${JSON.stringify(picks)}
+Магазины: Zara, H&M, Pull&Bear, Bershka, Massimo Dutti.
+Вопрос: ${q}
+Верни JSON: {"advice":"2-4 предложения","outfits":[{"style":"casual|smart|street|oldmoney|minimal|sport","itemIds":["id из гардероба"],"why":"одно предложение"}],"buy":[{"pickId":"id из каталога или пусто","name":"что купить","store":"магазин","why":"одно предложение"}]}. Образы собирай только из id гардероба (верх, низ, обувь, по желанию куртка и аксессуар), 1-3 образа. Покупок 1-3.`;
+    try{
+      const r=await sample.json(prompt,{modelTier:"default"});
+      const looks=(r.outfits||[]).map((o,i)=>({id:"ai"+i+Date.now(),style:STYLES.some(s=>s.id===o.style)?o.style:"casual",itemIds:(o.itemIds||[]).filter(byId),why:o.why,generated:true})).filter(o=>o.itemIds.length);
+      S.aiLooks=looks;
+      out.innerHTML=`<p class="out">${esc(r.advice||"")}</p>
+        ${looks.length?`<div class="looks">${looks.map((o,i)=>lookCard(o,i+1)).join("")}</div>`:""}
+        ${(r.buy||[]).length?`<h2 class="sec" style="margin-top:14px">Докупить</h2><div class="picks">${r.buy.map(b=>{const p=PICKS.find(x=>x.id===b.pickId);
+          const key=Object.keys(STORES).find(k=>STORES[k].ru.toLowerCase()===String(b.store||"").toLowerCase())||"zara";
+          return p?pickCard({...p,why:b.why||p.why}):`<article class="pick"><div class="pic">${art({cat:"tee",color:"grey"})}</div><div><h4>${esc(b.name)}</h4><p>${esc(b.why)}</p><div class="stores"><a href="${STORES[key].url(b.name)}" target="_blank" rel="noopener">${STORES[key].ru} ↗</a></div></div></article>`}).join("")}</div>`:""}`;
+      bindLooks([...looks,...S.gen,...S.outfits]); st.textContent="";
+    }catch(e){st.textContent=e&&e.code==="not_granted"?"Нужно разрешить стилиста для этой страницы":e&&e.code==="rate_limited"?"Слишком много вопросов подряд, попробуй через минуту":"Не получилось ответить, попробуй переформулировать";}
+    go.disabled=false;
+  };
+}
+
+/* ---------- sheets ---------- */
+function sheet(title,body,after){
+  $layer.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+    <div class="hd"><h2>${esc(title)}</h2><button class="x" id="close" aria-label="Закрыть">×</button></div>${body}</div></div>`;
+  document.getElementById("close").onclick=closeSheet;
+  document.getElementById("scrim").onclick=e=>{if(e.target.id==="scrim")closeSheet()};
+  document.addEventListener("keydown",escClose); after&&after($layer);
+}
+function escClose(e){if(e.key==="Escape")closeSheet()}
+function closeSheet(){$layer.innerHTML="";document.removeEventListener("keydown",escClose)}
+
+function openItem(id){
+  const i=byId(id); if(!i)return;
+  const saved=S.outfits.filter(o=>o.itemIds.includes(id));
+  const gen=generate({pin:i,count:4});
+  const pool=[...saved,...gen];
+  sheet(i.name,`
+    <div class="detail"><div class="pic">${art(i)}</div>
+      <div><dl class="kv"><dt>Тип</dt><dd>${esc(CATS[i.cat]?.ru)}</dd><dt>Цвет</dt><dd>${esc((COLORS[i.color]||{ru:i.color}).ru)}</dd>
+        <dt>Стили</dt><dd>${(i.styles||[]).map(s=>STYLE_RU[s]).join(", ")||"не указаны"}</dd>${i.brand?`<dt>Бренд</dt><dd>${esc(i.brand)}</dd>`:""}</dl>
+        ${i.example?'<p class="note">Это пример. Заменится на твою вещь, когда будут фото.</p>':""}
+        <div class="row" style="margin-top:12px"><button class="btn small ghost" id="edit" ${S.db?"":"disabled"}>Изменить</button><button class="btn small ghost" id="del" ${S.db?"":"disabled"}>Удалить</button></div></div></div>
+    <h2 class="sec">Образы с этой вещью <span class="count">${pool.length}</span></h2>
+    ${pool.length?`<div class="looks">${pool.map((o,n)=>lookCard(o,n+1)).join("")}</div>`:'<div class="empty">Пока не из чего собрать: добавь вещи других типов.</div>'}
+    <h2 class="sec">Докупить к ней</h2>
+    <div class="picks">${picksFor({item:i,limit:4}).map(pickCard).join("")}</div>`,
+    root=>{bindLooks(pool);
+      root.querySelector("#edit").onclick=()=>openForm(i);
+      const d=root.querySelector("#del"); d.onclick=()=>confirmInline(d,"Точно удалить?",async()=>{await S.db.doc("items/"+i.id).delete();closeSheet();toast("Вещь удалена")});});
+}
+function confirmInline(btn,text,fn){
+  if(btn.dataset.armed){fn();return}
+  btn.dataset.armed="1";const old=btn.textContent;btn.textContent=text;
+  setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old}},3500);
+}
+function openBuy(o){
+  if(!o)return; const picks=picksFor({outfit:o,limit:4});
+  sheet("Что докупить к образу",`<p class="lead">Вещи, которые освежат этот образ по трендам сезона.</p><div class="picks" style="margin-top:12px">${picks.map(pickCard).join("")}</div>`);
+}
+
+function openForm(item=null){
+  const it=item||{name:"",cat:"tee",color:"black",styles:["casual"]};
+  sheet(item?"Изменить вещь":"Новая вещь",`
+    <form class="f" id="itemForm">
+      <label for="f_photo">Фото (лучше на белом или однотонном фоне)<input type="file" id="f_photo" accept="image/*"></label>
+      <div id="f_prev" class="pic" style="max-width:180px">${art(it)}</div>
+      <label for="f_name">Название<input id="f_name" required value="${esc(it.name)}" placeholder="Например: Чёрная футболка оверсайз"></label>
+      <div class="two">
+        <label for="f_cat">Тип<select id="f_cat">${Object.entries(CATS).map(([k,c])=>`<option value="${k}" ${k===it.cat?"selected":""}>${c.ru}</option>`).join("")}</select></label>
+        <label for="f_color">Цвет<select id="f_color">${Object.entries(COLORS).map(([k,c])=>`<option value="${k}" ${k===it.color?"selected":""}>${c.ru}</option>`).join("")}</select></label>
+      </div>
+      <label for="f_brand">Бренд (необязательно)<input id="f_brand" value="${esc(it.brand||"")}"></label>
+      <div><div class="note" style="margin-bottom:6px">Стили</div><div class="row">${STYLES.map(s=>`<button type="button" class="chip" data-fs="${s.id}" aria-pressed="${(it.styles||[]).includes(s.id)}">${s.ru}</button>`).join("")}</div></div>
+      <div class="row"><button class="btn" type="submit" id="f_save">Сохранить</button><span class="status" id="f_st"></span></div>
+    </form>`,root=>{
+      let file=null;
+      root.querySelectorAll("[data-fs]").forEach(b=>b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true"));
+      root.querySelector("#f_photo").onchange=e=>{file=e.target.files[0]; if(file){const u=URL.createObjectURL(file);root.querySelector("#f_prev").innerHTML=`<img src="${u}" alt="">`}};
+      root.querySelector("#itemForm").onsubmit=async e=>{
+        e.preventDefault(); const st=root.querySelector("#f_st"), sv=root.querySelector("#f_save"); sv.disabled=true;
+        const data={name:root.querySelector("#f_name").value.trim(),cat:root.querySelector("#f_cat").value,color:root.querySelector("#f_color").value,
+          brand:root.querySelector("#f_brand").value.trim(),styles:[...root.querySelectorAll('[data-fs][aria-pressed="true"]')].map(b=>b.dataset.fs),example:false,updated:Date.now()};
+        try{
+          if(file){st.textContent="Загружаю фото…"; const assets=S.assets||await claude.use("assets"); if(!assets)throw{message:"Загрузка фото недоступна в этом окне"};
+            const blob=await shrink(file); const r=await assets.upload(blob); data.img=r.url; data.imgId=r.id;}
+          if(item) await S.db.doc("items/"+item.id).update(data);
+          else await S.db.collection("items").add({...data,created:Date.now()});
+          closeSheet(); toast(item?"Сохранено":"Вещь добавлена");
+        }catch(err){st.textContent=(err&&err.message)||"Не сохранилось, попробуй ещё раз";sv.disabled=false;}
+      };
+    });
+}
+async function shrink(file){
+  try{const bmp=await createImageBitmap(file); const k=Math.min(1,1400/Math.max(bmp.width,bmp.height));
+    const c=document.createElement("canvas");c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.86));}catch(e){return file}
+}
+function openBuilder(){
+  const sel=new Set();
+  sheet("Собрать образ вручную",`
+    <p class="lead">Отметь вещи, выбери стиль и сохрани.</p>
+    <div class="row" style="margin:12px 0">${STYLES.map((s,i)=>`<button type="button" class="chip" data-bs="${s.id}" aria-pressed="${i===0}">${s.ru}</button>`).join("")}</div>
+    <div class="picker">${S.items.map(i=>`<button type="button" data-pk="${esc(i.id)}" aria-pressed="false"><div class="pic">${art(i)}</div>${esc(i.name)}</button>`).join("")}</div>
+    <div class="row" style="margin-top:14px"><button class="btn" id="bSave">Сохранить образ</button><span class="status" id="bSt"></span></div>`,root=>{
+      let style="casual";
+      root.querySelectorAll("[data-bs]").forEach(b=>b.onclick=()=>{style=b.dataset.bs;root.querySelectorAll("[data-bs]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+      root.querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{const on=!sel.has(b.dataset.pk);on?sel.add(b.dataset.pk):sel.delete(b.dataset.pk);b.setAttribute("aria-pressed",on)});
+      root.querySelector("#bSave").onclick=async()=>{if(sel.size<2){root.querySelector("#bSt").textContent="Выбери хотя бы 2 вещи";return}
+        await saveLook({style,itemIds:[...sel]}); closeSheet();};
+    });
+}
+async function saveLook(o,btn){
+  if(!o||!S.db)return; if(btn)btn.disabled=true;
+  try{await S.db.collection("outfits").add({style:o.style,itemIds:o.itemIds,why:o.why||"",created:Date.now()});toast("Образ сохранён");
+    S.gen=S.gen.filter(x=>x.id!==o.id);}catch(e){toast("Не сохранилось");if(btn)btn.disabled=false;}
+}
+let tt;function toast(t){clearTimeout(tt);let el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}
+  el.textContent=t;tt=setTimeout(()=>el.remove(),2400)}
+
+/* ---------- boot ---------- */
+render();
+(async()=>{
+  const db=await (window.claude?.use?.("db")??null);
+  S.db=db;
+  if(!db){ /* public read-only copy: data comes from data.json */
+    try{const d=await (await fetch("data.json")).json();S.items=d.items;S.outfits=d.outfits;S.sample=null;document.body.classList.add("static");
+      $sync.textContent=`${S.items.length} вещей`;}catch(e){$sync.textContent="хранилище недоступно"}
+    S.loaded=true;render();return}
+  claude.use("assets").then(a=>S.assets=a).catch(()=>{});
+  claude.use("sample").then(s=>{S.sample=s; if(S.tab==="looks")render()}).catch(()=>{S.sample=null});
+  const ord=(a,b)=>(a.created||0)-(b.created||0);
+  db.collection("items").onSnapshot(snap=>{
+    S.items=snap.docs.map(d=>({id:d.id,...d.data()})).sort(ord); S.loaded=true;
+    $sync.textContent=`${S.items.length} вещей · синхронизировано`;
+    if(!S.gen.length||S.gen.some(o=>o.itemIds.some(id=>!byId(id)))) S.gen=[];
+    if(!$layer.innerHTML)render();
+  },()=>{S.loaded=true;$sync.textContent="ошибка загрузки";render()});
+  db.collection("outfits").onSnapshot(snap=>{
+    S.outfits=snap.docs.map(d=>({id:d.id,...d.data()})).sort(ord);
+    if(!$layer.innerHTML)render();
+  });
+})();
+})();
+
+/* Lightbox: tap a try-on or look photo to view it full screen. The controls sit at the bottom so they never
+   overlap the host app's own close button on phones; zoom is our own (tap / button), not page pinch-zoom. */
+document.addEventListener("click",e=>{
+  const im=e.target.closest(".me img,.mstrip img,.rboard img");
+  if(!im||im.closest(".lb")) return;
+  e.preventDefault();
+  const q=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+  const lb=document.createElement("div");lb.className="lb";lb.setAttribute("role","dialog");lb.setAttribute("aria-label","Фото крупно");
+  lb.innerHTML=`<img src="${q(im.currentSrc||im.src)}" alt="${q(im.alt||"")}"><div class="bar"><button type="button" data-z>Приблизить</button><button type="button" data-x>Закрыть</button></div>`;
+  const big=lb.querySelector("img"), zb=lb.querySelector("[data-z]");
+  const close=()=>{lb.remove();document.removeEventListener("keydown",onKey)};
+  const onKey=ev=>{if(ev.key==="Escape")close()};
+  const zoom=(fx=.5,fy=.3)=>{const on=lb.classList.toggle("z");zb.textContent=on?"Уменьшить":"Приблизить";
+    if(on){const r=big.getBoundingClientRect();lb.scrollTo(fx*r.width-innerWidth/2,fy*r.height-innerHeight/2)}else lb.scrollTo(0,0)};
+  big.onclick=ev=>{ev.stopPropagation();const r=big.getBoundingClientRect();zoom((ev.clientX-r.left)/r.width,(ev.clientY-r.top)/r.height)};
+  zb.onclick=ev=>{ev.stopPropagation();zoom()};
+  lb.querySelector("[data-x]").onclick=ev=>{ev.stopPropagation();close()};
+  lb.onclick=ev=>{if(ev.target===lb)close()};
+  document.addEventListener("keydown",onKey);
+  document.body.appendChild(lb);zb.focus();
+});
+</script>
+</body></html>
