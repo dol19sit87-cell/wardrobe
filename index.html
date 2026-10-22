@@ -91,6 +91,7 @@ h2.sec .count{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .pick{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px}
 .pick .pic{aspect-ratio:1/1}
+.pick.ph{grid-template-columns:120px minmax(0,1fr)}.pick.ph .me img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block;cursor:zoom-in}.pick .with{font-size:12px;color:var(--muted);margin-top:4px}
 .pick h4{margin:0;font-size:14.5px;font-weight:600}
 .pick p{margin:4px 0 8px;font-size:13px;color:var(--muted)}
 .stores{display:flex;flex-wrap:wrap;gap:5px}
@@ -396,10 +397,12 @@ const COMBOS=[
   ["ecru_tr+rib_tank+run_sneak",["sport"],"c_ecru_tr-rib_tank-run_sneak"],
   ["ecru_tr+matrona_hoodie+run_sneak",["sport"],"c_ecru_tr-matrona_hoodie-run_sneak"],
   ["maag_jeans+matrona_hoodie+run_sneak",["sport"],"c_maag_jeans-matrona_hoodie-run_sneak"],
-  ["maag_jeans+rib_tank+run_sneak",["sport"],"c_maag_jeans-rib_tank-run_sneak"]
+  ["maag_jeans+rib_tank+run_sneak",["sport"],"c_maag_jeans-rib_tank-run_sneak"],
+  ["biker+cream_tr+timberland+zara_tee",[],"c_biker-cream_tr-timberland-zara_tee"]
 ];
 const comboKey=ids=>ids.map(x=>x.replace(/^my_/,"")).sort().join("+");
 function tryonOf(o){
+  if(o.tryon) return o.tryon;
   if(/^my_look/.test(o.id)) return `tryon/${o.id}.jpg`;
   if((o.buy||[]).length) return null;
   const c=COMBOS.find(c=>c[0]===comboKey(o.itemIds));
@@ -414,6 +417,51 @@ function photoLooks(style,count=4,shuffle=false){
   return list.slice(0,count);
 }
 
+
+/* Shop add-ons tried on with owned items: [pick id, owned ids without my_, style, file]; photo at tryon/<file>.jpg. */
+const ADDONS=[
+  ["p1",["zara_tee","cream_tr","morato"],"oldmoney","a_p1"],
+  ["p1",["hdn_tee","maag_jeans","navy_sneak"],"casual","a_p1b"],
+  ["p2",["biker","rib_tank","timberland"],"street","a_p2"],
+  ["p3",["lime_linen","morato"],"smart","a_p3"],
+  ["p3",["maag_knitshirt","morato"],"oldmoney","a_p3b"],
+  ["p3",["maag_tank","navy_sneak"],"minimal","a_p3c"],
+  ["p4",["ecru_tr","morato"],"oldmoney","a_p4"],
+  ["p5",["cream_tr","navy_sneak"],"smart","a_p5"],
+  ["p6",["maag_jeans","grey_tee","cream_hoodie"],"casual","a_p6"],
+  ["p6",["maag_check","maag_jeans"],"street","a_p6b"],
+  ["p7",["hdn_tee","maag_jeans","timberland"],"street","a_p7"],
+  ["p7",["cream_hoodie","maag_jeans","navy_sneak"],"casual","a_p7b"],
+  ["p8",["grey_tee","ecru_tr","navy_sneak"],"casual","a_p8"],
+  ["p8",["lime_tee","cream_tr","morato"],"minimal","a_p8b"],
+  ["p9",["rib_tank","maag_jeans","timberland"],"street","a_p9"],
+  ["p10",["ecru_tr","morato"],"oldmoney","a_p10"],
+  ["p11",["lime_tee","cream_tr"],"oldmoney","a_p11"],
+  ["p11",["maag_tank","maag_jeans"],"casual","a_p11b"],
+  ["p12",["biker","maag_jeans","run_sneak"],"street","a_p12"],
+  ["p13",["zara_tee","maag_jeans","timberland"],"street","a_p13"],
+  ["p14",["ecru_zip","ecru_tr","navy_sneak"],"smart","a_p14"],
+  ["p15",["maag_knitshirt","ecru_tr","morato"],"oldmoney","a_p15"],
+  ["p15",["matrona_hoodie","ecru_tr","navy_sneak"],"minimal","a_p15b"],
+  ["p16",["maag_check","cream_tr","navy_sneak"],"casual","a_p16"],
+  ["p16",["maag_print","maag_jeans","run_sneak"],"street","a_p16b"],
+  ["p17",["lime_linen","maag_jeans"],"smart","a_p17"],
+  ["p17",["maag_print","cream_tr"],"casual","a_p17b"],
+  ["p17",["ecru_zip","ecru_tr"],"smart","a_p17c"],
+  ["p18",["matrona_hoodie","maag_jeans","run_sneak"],"sport","a_p18"]
+];
+function addonLook(a){const p=PICKS.find(x=>x.id===a[0]);
+  return {id:a[3],style:a[2],itemIds:a[1].map(x=>"my_"+x),why:p.why,tryon:`tryon/${a[3]}.jpg`,generated:true,
+    buy:[{name:p.ru,store:p.st.map(k=>STORES[k].ru).join(", "),url:STORES[p.st[0]].url(p.q)}]}}
+const addonsWith=id=>ADDONS.filter(a=>a[1].includes(id.replace(/^my_/,""))).map(addonLook).filter(o=>o.itemIds.every(byId));
+/* Photo looks that contain an owned item: own looks, then combos. */
+function photoLooksWith(id){
+  const own=S.outfits.filter(o=>o.itemIds.includes(id)&&tryonOf(o));
+  const seen=new Set(own.map(o=>comboKey(o.itemIds)));
+  const combos=COMBOS.filter(c=>c[0].split("+").includes(id.replace(/^my_/,""))&&!seen.has(c[0]))
+    .map(c=>({id:"c_"+c[0],style:c[1][0]||"street",itemIds:c[0].split("+").map(x=>"my_"+x),generated:true})).filter(o=>o.itemIds.every(byId));
+  return [...own,...combos];
+}
 /* ---------- rendering ---------- */
 function setTab(t){S.tab=t;try{localStorage.setItem("wr_tab",t)}catch(e){}
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"true":"false"));render();window.scrollTo(0,0)}
@@ -525,6 +573,10 @@ function renderStyles(){
   bindLooks(looks); bindOpen();
 }
 function pickCard(p){
+  const a=(typeof ADDONS!=="undefined"?ADDONS:[]).find(x=>x[0]===p.id&&x[1].every(y=>byId("my_"+y)));
+  if(a) return `<article class="pick ph"><div class="me"><img src="tryon/${a[3]}.jpg" alt="${esc(p.ru)} на тебе" loading="lazy" onerror="this.parentNode.outerHTML='<div class=pic>'+${JSON.stringify(art({cat:p.cat,color:p.color})).replace(/"/g,"&quot;")}+'</div>'"></div><div style="min-width:0">
+    <h4>${esc(p.ru)}</h4><p>${esc(p.why)}</p><p class="with">На фото с твоими вещами: ${a[1].map(y=>esc(byId("my_"+y).name.toLowerCase())).join(", ")}</p>
+    <div class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</div></div></article>`;
   return `<article class="pick"><div class="pic">${art({cat:p.cat,color:p.color})}</div><div style="min-width:0">
     <h4>${esc(p.ru)}</h4><p>${esc(p.why)}</p>
     <div class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</div></div></article>`;
@@ -802,9 +854,9 @@ function closeSheet(){$layer.innerHTML="";document.removeEventListener("keydown"
 
 function openItem(id){
   const i=byId(id); if(!i)return;
-  const saved=S.outfits.filter(o=>o.itemIds.includes(id));
-  const gen=generate({pin:i,count:4});
-  const pool=[...saved,...gen];
+  const ph=photoLooksWith(id);
+  const pool=ph.length>=2?ph:[...ph,...generate({pin:i,count:4})];
+  const add=addonsWith(id);
   sheet(i.name,`
     <div class="detail"><div class="pic">${art(i)}</div>
       <div><dl class="kv"><dt>Тип</dt><dd>${esc(CATS[i.cat]?.ru)}</dd><dt>Цвет</dt><dd>${esc((COLORS[i.color]||{ru:i.color}).ru)}</dd>
@@ -813,9 +865,9 @@ function openItem(id){
         <div class="row" style="margin-top:12px"><button class="btn small ghost" id="edit" ${S.db?"":"disabled"}>Изменить</button><button class="btn small ghost" id="del" ${S.db?"":"disabled"}>Удалить</button></div></div></div>
     <h2 class="sec">Образы с этой вещью <span class="count">${pool.length}</span></h2>
     ${pool.length?`<div class="looks">${pool.map((o,n)=>lookCard(o,n+1)).join("")}</div>`:'<div class="empty">Пока не из чего собрать: добавь вещи других типов.</div>'}
-    <h2 class="sec">Докупить к ней</h2>
-    <div class="picks">${picksFor({item:i,limit:4}).map(pickCard).join("")}</div>`,
-    root=>{bindLooks(pool);
+    <h2 class="sec">Докупить к ней <span class="count">${add.length||""}</span></h2>
+    ${add.length?`<div class="looks">${add.map((o,n)=>lookCard(o,n+1)).join("")}</div>`:`<div class="picks">${picksFor({item:i,limit:4}).map(pickCard).join("")}</div>`}`,
+    root=>{bindLooks([...pool,...add]);
       root.querySelector("#edit").onclick=()=>openForm(i);
       const d=root.querySelector("#del"); d.onclick=()=>confirmInline(d,"Точно удалить?",async()=>{await S.db.doc("items/"+i.id).delete();closeSheet();toast("Вещь удалена")});});
 }
@@ -825,8 +877,11 @@ function confirmInline(btn,text,fn){
   setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old}},3500);
 }
 function openBuy(o){
-  if(!o)return; const picks=picksFor({outfit:o,limit:4});
-  sheet("Что докупить к образу",`<p class="lead">Вещи, которые освежат этот образ по трендам сезона.</p><div class="picks" style="margin-top:12px">${picks.map(pickCard).join("")}</div>`);
+  if(!o)return;
+  const add=ADDONS.map(a=>[a,a[1].filter(x=>o.itemIds.includes("my_"+x)).length]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>addonLook(x[0])).filter(x=>x.itemIds.every(byId));
+  const picks=picksFor({outfit:o,limit:4});
+  sheet("Что докупить к образу",`<p class="lead">Как это выглядит на тебе вместе с твоими вещами.</p>
+    ${add.length?`<div class="looks" style="margin-top:12px">${add.map((x,n)=>lookCard(x,n+1)).join("")}</div>`:`<div class="picks" style="margin-top:12px">${picks.map(pickCard).join("")}</div>`}`,root=>bindLooks(add));
 }
 
 function openForm(item=null){
