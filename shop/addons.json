@@ -1,0 +1,128 @@
+{
+ "p1": {
+  "name": "Замшевая куртка с карманами, коньячная",
+  "store": "zara",
+  "price": 529,
+  "url": "https://www.zara.com/ge/en/leather-suede-jacket-with-pockets-p08281081.html?v1=556928096",
+  "img": "shop/a_p1.jpg"
+ },
+ "p2": {
+  "name": "Джинсы wide leg, светло-голубые",
+  "store": "zara",
+  "price": 179,
+  "url": "https://www.zara.com/ge/en/loose-fit-jeans-p03409307.html",
+  "img": "shop/a_p2.jpg"
+ },
+ "p3": {
+  "name": "Широкие брюки со складками, графит",
+  "store": "zara",
+  "price": 159,
+  "url": "https://www.zara.com/ge/en/relaxed-fit-pleated-chino-trousers-p06887452.html",
+  "img": "shop/a_p3.jpg"
+ },
+ "p4": {
+  "name": "Кашемировое поло, молочное",
+  "store": "md",
+  "price": 760,
+  "url": "https://www.massimodutti.com/ge/en/100-cashmere-knit-polo-sweater-l01282215?pelement=62574247",
+  "img": "shop/a_p4.jpg"
+ },
+ "p5": {
+  "name": "Свитер на молнии (quarter-zip), тёмно-синий, шерсть",
+  "store": "zara",
+  "price": 179,
+  "url": "https://www.zara.com/ge/en/100-wool-quarter-zip-jumper-p04216303.html",
+  "img": "shop/a_p5.jpg"
+ },
+ "p6": {
+  "name": "Ретро-кроссовки, красные",
+  "store": "bershka",
+  "price": 179,
+  "url": "https://www.bershka.com/ge/en/slim-retro-trainers-l12314864.html?colorId=020",
+  "img": "shop/a_p6.jpg"
+ },
+ "p7": {
+  "name": "Куртка кожаная коричневая, воротник-рубашка",
+  "store": "zara",
+  "price": 529,
+  "url": "https://www.zara.com/ge/en/regular-fit-leather-jacket-p05388300.html",
+  "img": "shop/a_p7.jpg"
+ },
+ "p8": {
+  "name": "Куртка с накладными карманами, тёмный хаки",
+  "store": "zara",
+  "price": 259,
+  "url": "https://www.zara.com/ge/en/padded-lyocell-cotton-jacket-p01437512.html",
+  "img": "shop/a_p8.jpg"
+ },
+ "p9": {
+  "name": "Куртка-рубашка утеплённая, коричневая клетка",
+  "store": "zara",
+  "price": 219,
+  "url": "https://www.zara.com/ge/en/check-padded-jacket-p03411380.html",
+  "img": "shop/a_p9.jpg"
+ },
+ "p10": {
+  "name": "Свитер в рубчик, бордовый, шерсть",
+  "store": "zara",
+  "price": 219,
+  "url": "https://www.zara.com/ge/en/100-wool-rib-knit-jumper-p02893356.html",
+  "img": "shop/a_p10.jpg"
+ },
+ "p11": {
+  "name": "Замшевые мокасины, табачные",
+  "store": "zara",
+  "price": 219,
+  "url": "https://www.zara.com/ge/en/leather-deck-shoes-p12432720.html",
+  "img": "shop/a_p11.jpg"
+ },
+ "p12": {
+  "name": "Худи на молнии, серый меланж",
+  "store": "pb",
+  "price": 159,
+  "url": "https://www.pullandbear.com/ge/neopreneeffect-zipup-hoodie-l07720501.html?colorId=803",
+  "img": "shop/a_p12.jpg"
+ },
+ "p13": {
+  "name": "Бомбер утеплённый, тёмно-синий",
+  "store": "pb",
+  "price": 119,
+  "url": "https://www.pullandbear.com/ge/padded-bomber-jacket-l07720500.html?colorId=407",
+  "img": "shop/a_p13.jpg"
+ },
+ "p14": {
+  "name": "Футболка slim fit, белая",
+  "store": "zara",
+  "price": 39,
+  "url": "https://www.zara.com/ge/en/basic-slim-fit-t-shirt--01-p05584401.html?v1=545485813",
+  "img": "shop/a_p14.jpg"
+ },
+ "p15": {
+  "name": "Пальто длинное, тёмно-серое, шерсть",
+  "store": "zara",
+  "price": 329,
+  "url": "https://www.zara.com/ge/en/relaxed-fit-wool-blend-coat-p08281615.html",
+  "img": "shop/a_p15.jpg"
+ },
+ "p16": {
+  "name": "Кепка вельветовая, тёмно-коричневая",
+  "store": "md",
+  "price": 190,
+  "url": "https://www.massimodutti.com/ge/en/corduroy-cap-l02690330.html?pelement=65691443",
+  "img": "shop/a_p16.jpg"
+ },
+ "p17": {
+  "name": "Замшевые челси, серо-коричневые",
+  "store": "zara",
+  "price": 219,
+  "url": "https://www.zara.com/ge/en/leather-chelsea-boots-p12001820.html",
+  "img": "shop/a_p17.jpg"
+ },
+ "p18": {
+  "name": "Парка с карманами, оливковая",
+  "store": "zara",
+  "price": 219,
+  "url": "https://www.zara.com/ge/en/utility-pocket-regular-fit-parka-p06786003.html",
+  "img": "shop/a_p18.jpg"
+ }
+}

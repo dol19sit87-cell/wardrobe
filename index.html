@@ -80,7 +80,7 @@ h2.sec .count{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter
 .look ul.tobuy img{width:36px;height:46px;object-fit:cover;border-radius:6px;background:var(--line)}
 .look ul.tobuy small{display:block;color:var(--muted);font-size:11.5px}
 .look ul.tobuy a.go{font-family:var(--f-mono);font-size:11px;text-decoration:none;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:4px 7px;white-space:nowrap}
-.look .bl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.look .bl,.pick .bl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:10px}
 .look .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .style{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:left;display:flex;flex-direction:column;gap:8px}
@@ -91,7 +91,7 @@ h2.sec .count{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .pick{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px}
 .pick .pic{aspect-ratio:1/1}
-.pick.ph{grid-template-columns:120px minmax(0,1fr)}.pick.ph .me img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block;cursor:zoom-in}.pick .with{font-size:12px;color:var(--muted);margin-top:4px}
+.pick.ph{grid-template-columns:120px minmax(0,1fr)}.pick.ph .me img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block;cursor:zoom-in}.pick .with{font-size:12px;color:var(--muted);margin-top:4px}.pick .prod{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;align-items:start;font-size:13px;margin-top:6px}.pick .prod img{width:44px;height:44px;object-fit:cover;border-radius:6px}.pick .prod small,.look ul.tobuy small.alt{display:block;color:var(--muted)}.pick .prod a.go{display:inline-block;margin-top:2px}.look ul.tobuy small.alt a{margin-right:6px}
 .pick h4{margin:0;font-size:14.5px;font-weight:600}
 .pick p{margin:4px 0 8px;font-size:13px;color:var(--muted)}
 .stores{display:flex;flex-wrap:wrap;gap:5px}
@@ -250,19 +250,19 @@ const PICKS = [
   {id:"p3",ru:"Брюки со стрелками свободного кроя",cat:"trousers",color:"charcoal",styles:["smart","minimal","oldmoney"],q:"pleated relaxed trousers",st:["zara","md","hm"],why:"Широкая брючина с защипами вместо зауженных чинос."},
   {id:"p4",ru:"Трикотажное поло с длинным рукавом",cat:"knit",color:"cream",styles:["oldmoney","smart"],q:"knit polo long sleeve",st:["md","zara","hm"],why:"Главная вещь тихой роскоши. Подходит и под джинсы, и под брюки."},
   {id:"p5",ru:"Свитер на молнии (quarter-zip)",cat:"knit",color:"navy",styles:["smart","oldmoney","casual"],q:"quarter zip sweater",st:["md","zara","hm","pb"],why:"Носится поверх футболки или рубашки, выглядит собранно без пиджака."},
-  {id:"p6",ru:"Ретро-кроссовки из замши",cat:"sneakers",color:"burgundy",styles:["casual","street","sport"],q:"retro suede sneakers",st:["zara","pb","bershka"],why:"Низкие тонкие кроссовки в духе 70-х вытесняют массивные «дэд-шуз»."},
+  {id:"p6",ru:"Ретро-кроссовки, красные",cat:"sneakers",color:"red",styles:["casual","street","sport"],q:"retro trainers red",st:["zara","pb","bershka"],why:"Низкие тонкие кроссовки в духе 70-х вытесняют массивные «дэд-шуз»."},
   {id:"p7",ru:"Кожаная куртка (коричневая)",cat:"outer",color:"brown",styles:["street","casual","smart"],q:"leather jacket brown",st:["zara","bershka","pb","md"],why:"Коричневая кожа вместо чёрной: мягче и актуальнее."},
-  {id:"p8",ru:"Рабочая куртка (chore jacket)",cat:"outer",color:"khaki",styles:["casual","minimal"],q:"chore jacket workwear",st:["hm","zara","pb"],why:"Воркуэр-силуэт с накладными карманами. Работает как пиджак для кэжуала."},
-  {id:"p9",ru:"Фланелевая рубашка-овершот",cat:"shirt",color:"brown",styles:["casual","street"],q:"overshirt flannel",st:["pb","bershka","hm","zara"],why:"Носится расстёгнутой поверх футболки как лёгкая куртка."},
-  {id:"p10",ru:"Свитер крупной вязки",cat:"knit",color:"burgundy",styles:["oldmoney","casual"],q:"chunky knit sweater",st:["zara","md","hm"],why:"Бордовый в тренде второй сезон подряд. Крупная вязка добавляет фактуру."},
+  {id:"p8",ru:"Куртка с накладными карманами, хаки",cat:"outer",color:"khaki",styles:["casual","minimal"],q:"khaki pocket jacket",st:["hm","zara","pb"],why:"Воркуэр-силуэт с накладными карманами. Работает как пиджак для кэжуала."},
+  {id:"p9",ru:"Куртка-рубашка в клетку, утеплённая",cat:"shirt",color:"brown",styles:["casual","street"],q:"check padded overshirt",st:["pb","bershka","hm","zara"],why:"Носится расстёгнутой поверх футболки как лёгкая куртка."},
+  {id:"p10",ru:"Свитер в рубчик, бордовый",cat:"knit",color:"burgundy",styles:["oldmoney","casual"],q:"rib knit sweater burgundy",st:["zara","md","hm"],why:"Бордовый в тренде второй сезон подряд. Рубчик добавляет фактуру."},
   {id:"p11",ru:"Лоферы",cat:"shoes",color:"brown",styles:["oldmoney","smart"],q:"loafers",st:["zara","md"],why:"Лоферы с джинсами и белыми носками сейчас носят даже в кэжуале."},
   {id:"p12",ru:"Зип-худи плотное",cat:"hoodie",color:"grey",styles:["sport","street","casual"],q:"zip hoodie heavyweight",st:["hm","pb","bershka"],why:"Серый меланж и плотный хлопок. Под бомбер или кожаную куртку."},
-  {id:"p13",ru:"Варсити-бомбер",cat:"outer",color:"navy",styles:["street","sport"],q:"varsity jacket",st:["bershka","pb","hm"],why:"Студенческий бомбер с нашивками остаётся хитом стритвира."},
+  {id:"p13",ru:"Бомбер тёмно-синий",cat:"outer",color:"navy",styles:["street","sport"],q:"bomber jacket navy",st:["bershka","pb","hm"],why:"Короткий тёмно-синий бомбер: база стритвира, носится с джинсами и ботинками."},
   {id:"p14",ru:"Приталенная футболка slim fit",cat:"tee",color:"white",styles:["minimal","smart","casual"],q:"slim fit t-shirt",st:["zara","md","hm","pb"],why:"Плотный хлопок по фигуре. Заправляй в широкие брюки или джинсы, так силуэт выглядит собранно."},
   {id:"p15",ru:"Пальто-шинель / длинное пальто",cat:"outer",color:"charcoal",styles:["minimal","smart","oldmoney"],q:"wool blend coat",st:["zara","md","hm"],why:"Длинное пальто поверх худи или свитера для зимы в Тбилиси."},
   {id:"p16",ru:"Кепка из вельвета или замши",cat:"acc",color:"brown",styles:["casual","street","oldmoney"],q:"corduroy cap",st:["pb","bershka","hm","zara"],why:"Недорогой способ добавить модную фактуру."},
   {id:"p17",ru:"Замшевые ботинки челси",cat:"boots",color:"brown",styles:["smart","oldmoney","casual"],q:"suede chelsea boots",st:["zara","md"],why:"Заменяют кроссовки осенью и подходят и к джинсам, и к брюкам."},
-  {id:"p18",ru:"Технический анорак / шелл",cat:"outer",color:"olive",styles:["street","sport"],q:"technical jacket",st:["pb","bershka","hm"],why:"Горпкор-ветровка с капюшоном на дождливую погоду."}
+  {id:"p18",ru:"Парка с карманами, оливковая",cat:"outer",color:"olive",styles:["street","sport"],q:"utility parka olive",st:["pb","bershka","hm"],why:"Оливковая парка с карманами на дождь и ветер, в духе горпкора."}
 ];
 
 /* ---------- placeholder silhouettes ---------- */
@@ -450,9 +450,15 @@ const ADDONS=[
   ["p17",["ecru_zip","ecru_tr"],"smart","a_p17c"],
   ["p18",["matrona_hoodie","maag_jeans","run_sneak"],"sport","a_p18"]
 ];
+/* ADDPROD: the real product each add-on photo was made with (shop/addons.json); other stores are analogs. */
+let ADDPROD={};
+fetch("shop/addons.json").then(r=>r.ok?r.json():{}).then(j=>{if(j&&Object.keys(j).length){ADDPROD=j;render()}}).catch(()=>{});
+function pickBuy(p){const r=ADDPROD[p.id];
+  const alt=p.st.filter(k=>!r||k!==r.store).map(k=>({ru:STORES[k].ru,url:STORES[k].url(p.q)}));
+  return r?{name:r.name,store:STORES[r.store]?.ru||r.store,price:r.price,url:r.url,img:r.img,alt}
+    :{name:p.ru,store:p.st.map(k=>STORES[k].ru).join(", "),url:STORES[p.st[0]].url(p.q)};}
 function addonLook(a){const p=PICKS.find(x=>x.id===a[0]);
-  return {id:a[3],style:a[2],itemIds:a[1].map(x=>"my_"+x),why:p.why,tryon:`tryon/${a[3]}.jpg`,generated:true,
-    buy:[{name:p.ru,store:p.st.map(k=>STORES[k].ru).join(", "),url:STORES[p.st[0]].url(p.q)}]}}
+  return {id:a[3],style:a[2],itemIds:a[1].map(x=>"my_"+x),why:p.why,tryon:`tryon/${a[3]}.jpg`,generated:true,buy:[pickBuy(p)]}}
 const addonsWith=id=>ADDONS.filter(a=>a[1].includes(id.replace(/^my_/,""))).map(addonLook).filter(o=>o.itemIds.every(byId));
 /* Photo looks that contain an owned item: own looks, then combos. */
 function photoLooksWith(id){
@@ -520,7 +526,7 @@ function lookCard(o,n){
       <div class="num">LOOK ${String(n).padStart(2,"0")}</div>
       <h3>${esc(STYLE_RU[o.style]||"Образ")}</h3>
       <ul>${sorted.map(p=>`<li><a href="#" data-open="${esc(p.id)}" style="color:inherit">${esc(p.name)}</a></li>`).join("")}</ul>
-      ${(o.buy||[]).length?`<div class="bl">Докупить</div><ul class="tobuy">${o.buy.map(b=>`<li>${b.img?`<img src="${esc(b.img)}" alt="" loading="lazy">`:"<span></span>"}<span>${esc(b.name)}<small>${esc(b.store||"")}${b.price?` · ${b.price} ₾`:""}</small>${b.url?`<a class="go" href="${esc(b.url)}" target="_blank" rel="noopener">Открыть ↗</a>`:""}</span></li>`).join("")}</ul>`:""}
+      ${(o.buy||[]).length?`<div class="bl">Докупить</div><ul class="tobuy">${o.buy.map(b=>`<li>${b.img?`<img src="${esc(b.img)}" alt="" loading="lazy">`:"<span></span>"}<span>${esc(b.name)}<small>${esc(b.store||"")}${b.price?` · ${b.price} ₾`:""}</small>${b.url?`<a class="go" href="${esc(b.url)}" target="_blank" rel="noopener">Открыть ↗</a>`:""}${(b.alt||[]).length?`<small class="alt">Аналоги: ${b.alt.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.ru)} ↗</a>`).join(" ")}</small>`:""}</span></li>`).join("")}</ul>`:""}
       ${o.why?`<div class="why">${esc(o.why)}</div>`:""}
       <div class="acts">
         ${o.generated?`<button class="btn small" data-save="${esc(o.id)}" ${S.db?"":"disabled"}>Сохранить</button>`:`<button class="btn small ghost" data-del-look="${esc(o.id)}">Удалить</button>`}
@@ -576,7 +582,9 @@ function pickCard(p){
   const a=(typeof ADDONS!=="undefined"?ADDONS:[]).find(x=>x[0]===p.id&&x[1].every(y=>byId("my_"+y)));
   if(a) return `<article class="pick ph"><div class="me"><img src="tryon/${a[3]}.jpg" alt="${esc(p.ru)} на тебе" loading="lazy" onerror="this.parentNode.outerHTML='<div class=pic>'+${JSON.stringify(art({cat:p.cat,color:p.color})).replace(/"/g,"&quot;")}+'</div>'"></div><div style="min-width:0">
     <h4>${esc(p.ru)}</h4><p>${esc(p.why)}</p><p class="with">На фото с твоими вещами: ${a[1].map(y=>esc(byId("my_"+y).name.toLowerCase())).join(", ")}</p>
-    <div class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</div></div></article>`;
+    ${(()=>{const b=pickBuy(p);return b.alt?`<div class="prod">${b.img?`<img src="${esc(b.img)}" alt="" loading="lazy">`:""}<span><b>На фото:</b> ${esc(b.name)}<small>${esc(b.store)}${b.price?` · ${b.price} ₾`:""}</small><a class="go" href="${esc(b.url)}" target="_blank" rel="noopener">Открыть ↗</a></span></div>
+    ${b.alt.length?`<div class="bl" style="margin-top:8px">Аналоги</div><div class="stores">${b.alt.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.ru)} ↗</a>`).join("")}</div>`:""}`
+      :`<div class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</div>`})()}</div></article>`;
   return `<article class="pick"><div class="pic">${art({cat:p.cat,color:p.color})}</div><div style="min-width:0">
     <h4>${esc(p.ru)}</h4><p>${esc(p.why)}</p>
     <div class="stores">${p.st.map(s=>`<a href="${STORES[s].url(p.q)}" target="_blank" rel="noopener">${STORES[s].ru} ↗</a>`).join("")}</div></div></article>`;
