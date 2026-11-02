@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Анкета клиента · Стилист Ирина Ситко</title>
+<meta property="og:title" content="Анкета клиента · Офлайн разбор гардероба">
+<meta property="og:description" content="Персональный стилист Ирина Ситко">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Forum&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--dark:#2a2a2a;--ink:#2a2a2a;--muted:#808080;--line:#d9d9d9;--field:#f2f2f2;--bg:#ffffff;--page:#ececec}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:Montserrat,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-weight:400;font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:760px;margin:0 auto;background:var(--bg);min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.06)}
+/* header */
+.hero{position:relative;background:var(--dark);color:#fff;display:flex;min-height:330px;overflow:hidden}
+.hero .img{position:absolute;inset:0 auto 0 0;width:46%;background:url(mannequin.jpg) center 15%/cover;filter:grayscale(1) brightness(.95)}
+.hero .img:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(42,42,42,0) 45%,#2a2a2a 100%)}
+.hero .t{position:relative;margin-left:44%;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:36px 28px}
+.hero .l{width:100%;height:1px;background:rgba(255,255,255,.7)}
+.hero h1{font-family:Forum,serif;font-weight:400;font-size:34px;letter-spacing:.22em;padding-left:.22em;margin:22px 0 8px;line-height:1.15}
+.hero h2{font-weight:300;font-size:11px;letter-spacing:.38em;padding-left:.38em;margin:0 0 22px;opacity:.9}
+.hero p{font-family:Forum,serif;font-size:17px;letter-spacing:.12em;margin:22px 0 0;opacity:.92}
+@media (max-width:560px){
+  .hero{min-height:0;flex-direction:column}
+  .hero .img{position:relative;width:100%;height:300px}
+  .hero .img:after{background:linear-gradient(180deg,rgba(42,42,42,0) 55%,#2a2a2a 100%)}
+  .hero .t{margin:0;padding:6px 22px 30px}
+  .hero h1{font-size:27px}
+  .hero h2{font-size:10px;letter-spacing:.3em}
+}
+main{padding:30px 36px 40px}
+@media (max-width:560px){main{padding:24px 18px 32px}}
+.hello{font-family:Forum,serif;font-size:24px;letter-spacing:.06em;margin:0 0 8px}
+.intro{font-size:14px;color:#444;margin:0 0 8px;line-height:1.6}
+.sec{font-family:Forum,serif;font-weight:400;font-size:19px;letter-spacing:.24em;text-transform:uppercase;margin:38px 0 6px;padding-bottom:8px;border-bottom:1px solid #9a9a9a}
+.q{margin:20px 0 0}
+.q label.qt,.q .qt{display:flex;gap:10px;font-size:15px;font-weight:400;margin-bottom:8px}
+.q .n{color:var(--muted);min-width:24px;font-weight:300}
+.q .hint{font-size:12.5px;color:var(--muted);margin:-4px 0 8px 34px}
+textarea,input[type=text],input[type=email],input[type=tel]{width:100%;margin-left:0;display:block;border:0;border-left:2px solid #b5b5b5;background:var(--field);padding:11px 14px;font:inherit;font-size:16px;color:var(--ink);border-radius:0;resize:vertical;min-height:48px;outline:none;transition:border-color .2s}
+textarea:focus,input:focus{border-left-color:var(--dark);background:#ededed}
+.field{margin-left:34px}
+@media (max-width:560px){.field,.q .hint{margin-left:0}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chips label{cursor:pointer}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips span{display:inline-block;border:1px solid #bdbdbd;padding:8px 14px;font-size:13.5px;letter-spacing:.02em;transition:all .15s;user-select:none}
+.chips input:checked+span{background:var(--dark);border-color:var(--dark);color:#fff}
+.chips input:focus-visible+span{outline:2px solid #777;outline-offset:2px}
+.req{color:#9a3b3b}
+.send{margin:40px 0 0;text-align:center}
+button{font-family:Forum,serif;font-size:17px;letter-spacing:.26em;padding:16px 38px 16px 44px;background:var(--dark);color:#fff;border:0;cursor:pointer;text-transform:uppercase;transition:opacity .2s}
+button:disabled{opacity:.55;cursor:default}
+.err{color:#9a3b3b;font-size:14px;margin-top:14px;min-height:1em}
+.thanks{text-align:center;padding:60px 24px 70px}
+.thanks h3{font-family:Forum,serif;font-weight:400;font-size:30px;letter-spacing:.24em;margin:0 0 14px}
+.thanks p{color:#555;font-size:15px;margin:6px 0}
+.sign{font-family:Forum,serif;font-size:18px;letter-spacing:.12em;margin-top:22px!important;color:var(--ink)!important}
+footer{border-top:1px solid var(--dark);margin:0 36px;padding:10px 0 24px;display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.2em;color:#666;text-transform:uppercase}
+@media (max-width:560px){footer{margin:0 18px;flex-direction:column;gap:4px}}
+.hp{position:absolute;left:-9999px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="img" role="img" aria-label="Манекен"></div>
+    <div class="t">
+      <div class="l"></div>
+      <h1>АНКЕТА КЛИЕНТА</h1>
+      <h2>ОФЛАЙН РАЗБОР ГАРДЕРОБА</h2>
+      <div class="l"></div>
+      <p>Персональный стилист Ирина Ситко</p>
+    </div>
+  </header>
+
+  <main id="main">
+    <p class="hello">Здравствуйте!</p>
+    <p class="intro">Эта анкета поможет мне познакомиться с вами до встречи и провести разбор гардероба с учётом вашего образа жизни, задач и пожеланий. Отвечайте своими словами, коротко или подробно, как вам удобно. Если вопрос вам не подходит, просто пропустите его.</p>
+    <p class="intro">Когда закончите, нажмите «Отправить» внизу страницы, и ответы придут мне.</p>
+
+    <form id="f" novalidate>
+      <div id="qs"></div>
+      <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="send">
+        <button type="submit" id="btn">Отправить</button>
+        <div class="err" id="err" role="alert"></div>
+      </div>
+    </form>
+  </main>
+
+  <section class="thanks hidden" id="thanks">
+    <h3>СПАСИБО!</h3>
+    <p>Анкета отправлена.</p>
+    <p>До встречи на разборе гардероба</p>
+    <p class="sign">Персональный стилист Ирина Ситко</p>
+  </section>
+
+  <footer><span>Разбор гардероба</span><span>Анкета клиента</span></footer>
+</div>
+
+<script>
+// Form delivery endpoint (FormSubmit). After activation it can be replaced with the random alias.
+const ENDPOINT = "https://formsubmit.co/ajax/dol19sit87@gmail.com";
+const STORE = "anketa-offline-v1";
+
+const S = [
+ ["О вас", [
+  ["Имя и фамилия", {req:true, input:"text", ac:"name"}],
+  ["Телефон или ник в Telegram для связи", {input:"text", ac:"tel"}],
+  ["Возраст", {input:"text"}],
+  ["Город проживания", {input:"text"}],
+  ["Ваши параметры: рост / вес / размер одежды / размер обуви"],
+  ["Цвет волос и цвет глаз"],
+  ["Носите ли вы очки?"],
+ ]],
+ ["Работа и образ жизни", [
+  ["Профессия, место работы / должность"],
+  ["Есть ли на работе дресс-код? Какой?"],
+  ["Как вы обычно одеваетесь на работу?"],
+  ["Какое впечатление вы хотите производить на работе?"],
+  ["Хобби и увлечения. Как вы проводите свободное время?"],
+  ["Посещаете ли вы театр / кино / выставки / мероприятия?"],
+  ["Занимаетесь ли вы спортом? Каким?"],
+ ]],
+ ["Цель", [
+  ["Причина обращения к стилисту"],
+  ["Жизненные цели (карьера, личная жизнь, творчество и т. д.)"],
+  ["Какое впечатление вы хотите производить (стильная, успешная и т. д.)?"],
+  ["Какой образ жизни вам ближе?", {hint:"Можно выбрать несколько вариантов и дописать свой", chips:["Мама в декрете","Бизнес-леди","Творческая натура","Модница (тренды)","Королева вечеринок","Путешественница"]}],
+  ["Ваши ожидания от нового образа"],
+ ]],
+ ["Внешность", [
+  ["Что вам в себе нравится? Что вы считаете достоинствами своей внешности?"],
+  ["Что бы вы хотели изменить в себе или скрыть?"],
+  ["Наносите ли вы макияж?"],
+ ]],
+ ["Гардероб и предпочтения", [
+  ["Какие цвета преобладают в вашем гардеробе?"],
+  ["Любимые цвета. В каких цветах вы чувствуете себя комфортно?"],
+  ["Какие цвета вам не нравятся?"],
+  ["Любимые фасоны в одежде"],
+  ["Какие формы и длины в одежде для вас допустимы?"],
+  ["Соотношение комфорта и стиля: что для вас важнее?"],
+  ["В каких магазинах вы обычно покупаете одежду? Есть ли любимые бренды?"],
+  ["Носите ли вы аксессуары? Какие и как часто?"],
+  ["Какую обувь вы предпочитаете? Как относитесь к каблукам?"],
+  ["Стильные табу: что вы никогда не наденете (например, высокий каблук, зелёный цвет и т. д.)?"],
+  ["Есть ли у вас «икона стиля»? Кто?"],
+  ["Что ещё мне нужно знать о вас из того, что я могла не спросить?"],
+ ]],
+];
+
+const qs = document.getElementById("qs");
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let n = 0, html = "";
+const fields = [];
+for (const [title, items] of S) {
+  html += `<h2 class="sec">${esc(title)}</h2>`;
+  for (const [q, o = {}] of items) {
+    n++;
+    const id = "q" + n;
+    const key = `${String(n).padStart(2,"0")}. ${q}`;
+    fields.push({id, key, chips: !!o.chips});
+    html += `<div class="q"><label class="qt" for="${id}"><span class="n">${n}.</span><span>${esc(q)}${o.req ? ' <span class="req">*</span>' : ""}</span></label>`;
+    if (o.hint) html += `<div class="hint">${esc(o.hint)}</div>`;
+    html += `<div class="field">`;
+    if (o.chips) {
+      html += `<div class="chips">` + o.chips.map(c => `<label><input type="checkbox" name="${id}c" value="${esc(c)}"><span>${esc(c)}</span></label>`).join("") + `</div>`;
+      html += `<input type="text" id="${id}" placeholder="Свой вариант">`;
+    } else if (o.input) {
+      html += `<input type="text" id="${id}" ${o.ac ? `autocomplete="${o.ac}"` : ""} ${o.req ? "required" : ""}>`;
+    } else {
+      html += `<textarea id="${id}" rows="2"></textarea>`;
+    }
+    html += `</div></div>`;
+  }
+}
+qs.innerHTML = html;
+
+// autosize textareas
+const grow = t => { t.style.height = "auto"; t.style.height = (t.scrollHeight + 2) + "px"; };
+document.querySelectorAll("textarea").forEach(t => t.addEventListener("input", () => grow(t)));
+
+// keep a draft in this browser only (convenience; works without it)
+function save() {
+  try {
+    const d = {};
+    for (const f of fields) {
+      d[f.id] = document.getElementById(f.id).value;
+      if (f.chips) d[f.id + "c"] = [...document.querySelectorAll(`input[name="${f.id}c"]:checked`)].map(i => i.value);
+    }
+    localStorage.setItem(STORE, JSON.stringify(d));
+  } catch (e) {}
+}
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(STORE) || "null"); if (!d) return;
+    for (const f of fields) {
+      const el = document.getElementById(f.id);
+      if (d[f.id]) { el.value = d[f.id]; if (el.tagName === "TEXTAREA") grow(el); }
+      if (f.chips && d[f.id + "c"]) document.querySelectorAll(`input[name="${f.id}c"]`).forEach(i => i.checked = d[f.id + "c"].includes(i.value));
+    }
+  } catch (e) {}
+}
+load();
+document.getElementById("f").addEventListener("input", save);
+document.getElementById("f").addEventListener("change", save);
+
+document.getElementById("f").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const err = document.getElementById("err"), btn = document.getElementById("btn");
+  err.textContent = "";
+  const name = document.getElementById("q1").value.trim();
+  if (!name) { err.textContent = "Пожалуйста, укажите имя и фамилию"; document.getElementById("q1").focus(); return; }
+  const data = {};
+  for (const f of fields) {
+    let v = document.getElementById(f.id).value.trim();
+    if (f.chips) {
+      const c = [...document.querySelectorAll(`input[name="${f.id}c"]:checked`)].map(i => i.value);
+      v = [c.join(", "), v].filter(Boolean).join(". ");
+    }
+    data[f.key] = v || "—";
+  }
+  data._subject = "Анкета клиента (офлайн разбор): " + name;
+  data._template = "table";
+  data._captcha = "false";
+  data._honey = document.querySelector('[name="_honey"]').value;
+  btn.disabled = true; btn.textContent = "Отправляю…";
+  try {
+    const r = await fetch(ENDPOINT, {method: "POST", headers: {"Content-Type": "application/json", "Accept": "application/json"}, body: JSON.stringify(data)});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || String(j.success) !== "true") throw new Error(j.message || r.status);
+    try { localStorage.removeItem(STORE); } catch (e) {}
+    document.getElementById("main").classList.add("hidden");
+    document.getElementById("thanks").classList.remove("hidden");
+    window.scrollTo({top: 0, behavior: "smooth"});
+  } catch (e) {
+    err.textContent = "Не получилось отправить. Проверьте интернет и нажмите ещё раз. Ответы сохранены на этой странице.";
+    btn.disabled = false; btn.textContent = "Отправить";
+  }
+});
+</script>
+</body>
+</html>
