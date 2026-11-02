@@ -56,6 +56,7 @@ textarea:focus,input:focus{border-left-color:var(--dark);background:#ededed}
 .send{margin:40px 0 0;text-align:center}
 button{font-family:Forum,serif;font-size:17px;letter-spacing:.26em;padding:16px 38px 16px 44px;background:var(--dark);color:#fff;border:0;cursor:pointer;text-transform:uppercase;transition:opacity .2s}
 button:disabled{opacity:.55;cursor:default}
+.wait{color:#777;font-size:13px;margin-top:14px}
 .err{color:#9a3b3b;font-size:14px;margin-top:14px;min-height:1em}
 .thanks{text-align:center;padding:60px 24px 70px}
 .thanks h3{font-family:Forum,serif;font-weight:400;font-size:30px;letter-spacing:.24em;margin:0 0 14px}
@@ -90,6 +91,7 @@ footer{border-top:1px solid var(--dark);margin:0 36px;padding:10px 0 24px;displa
       <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="send">
         <button type="submit" id="btn">Отправить</button>
+        <div class="wait hidden" id="wait">Отправка занимает до 30 секунд, не закрывайте страницу</div>
         <div class="err" id="err" role="alert"></div>
       </div>
     </form>
@@ -233,8 +235,10 @@ document.getElementById("f").addEventListener("submit", async ev => {
   data._captcha = "false";
   data._honey = document.querySelector('[name="_honey"]').value;
   btn.disabled = true; btn.textContent = "Отправляю…";
+  const wait = document.getElementById("wait"); wait.classList.remove("hidden");
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 90000);
   try {
-    const r = await fetch(ENDPOINT, {method: "POST", headers: {"Content-Type": "application/json", "Accept": "application/json"}, body: JSON.stringify(data)});
+    const r = await fetch(ENDPOINT, {signal: ctl.signal, method: "POST", headers: {"Content-Type": "application/json", "Accept": "application/json"}, body: JSON.stringify(data)});
     const j = await r.json().catch(() => ({}));
     if (!r.ok || String(j.success) !== "true") throw new Error(j.message || r.status);
     try { localStorage.removeItem(STORE); } catch (e) {}
@@ -242,6 +246,7 @@ document.getElementById("f").addEventListener("submit", async ev => {
     document.getElementById("thanks").classList.remove("hidden");
     window.scrollTo({top: 0, behavior: "smooth"});
   } catch (e) {
+    clearTimeout(tm); wait.classList.add("hidden");
     err.textContent = "Не получилось отправить. Проверьте интернет и нажмите ещё раз. Ответы сохранены на этой странице.";
     btn.disabled = false; btn.textContent = "Отправить";
   }
