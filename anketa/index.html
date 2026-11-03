@@ -87,6 +87,7 @@ footer{border-top:1px solid var(--dark);margin:0 36px;padding:10px 0 24px;displa
     <p class="intro">Когда закончите, нажмите «Отправить» внизу страницы, и ответы придут мне.</p>
 
     <form id="f" novalidate>
+      <div class="q" style="margin-top:30px"><label class="qt" for="nm"><span>Ваше имя <span class="req">*</span></span></label><input type="text" id="nm" autocomplete="name" required></div>
       <div id="qs"></div>
       <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="send">
@@ -110,52 +111,36 @@ footer{border-top:1px solid var(--dark);margin:0 36px;padding:10px 0 24px;displa
 <script>
 // Form delivery endpoint (FormSubmit). After activation it can be replaced with the random alias.
 const ENDPOINT = "https://formsubmit.co/ajax/dol19sit87@gmail.com";
-const STORE = "anketa-offline-v1";
+const STORE = "anketa-offline-v2";
 
 const S = [
- ["О вас", [
-  ["Имя и фамилия", {req:true, input:"text", ac:"name"}],
-  ["Телефон или ник в Telegram для связи", {input:"text", ac:"tel"}],
-  ["Возраст", {input:"text"}],
-  ["Город проживания", {input:"text"}],
-  ["Ваши параметры: рост / вес / размер одежды / размер обуви"],
-  ["Цвет волос и цвет глаз"],
-  ["Носите ли вы очки?"],
- ]],
- ["Работа и образ жизни", [
-  ["Профессия, место работы / должность"],
-  ["Есть ли на работе дресс-код? Какой?"],
-  ["Как вы обычно одеваетесь на работу?"],
-  ["Какое впечатление вы хотите производить на работе?"],
-  ["Хобби и увлечения. Как вы проводите свободное время?"],
-  ["Посещаете ли вы театр / кино / выставки / мероприятия?"],
-  ["Занимаетесь ли вы спортом? Каким?"],
- ]],
- ["Цель", [
-  ["Причина обращения к стилисту"],
-  ["Жизненные цели (карьера, личная жизнь, творчество и т. д.)"],
-  ["Какое впечатление вы хотите производить (стильная, успешная и т. д.)?"],
-  ["Какой образ жизни вам ближе?", {hint:"Можно выбрать несколько вариантов и дописать свой", chips:["Мама в декрете","Бизнес-леди","Творческая натура","Модница (тренды)","Королева вечеринок","Путешественница"]}],
-  ["Ваши ожидания от нового образа"],
- ]],
- ["Внешность", [
-  ["Что вам в себе нравится? Что вы считаете достоинствами своей внешности?"],
-  ["Что бы вы хотели изменить в себе или скрыть?"],
-  ["Наносите ли вы макияж?"],
- ]],
- ["Гардероб и предпочтения", [
-  ["Какие цвета преобладают в вашем гардеробе?"],
-  ["Любимые цвета. В каких цветах вы чувствуете себя комфортно?"],
-  ["Какие цвета вам не нравятся?"],
-  ["Любимые фасоны в одежде"],
-  ["Какие формы и длины в одежде для вас допустимы?"],
-  ["Соотношение комфорта и стиля: что для вас важнее?"],
-  ["В каких магазинах вы обычно покупаете одежду? Есть ли любимые бренды?"],
-  ["Носите ли вы аксессуары? Какие и как часто?"],
-  ["Какую обувь вы предпочитаете? Как относитесь к каблукам?"],
-  ["Стильные табу: что вы никогда не наденете (например, высокий каблук, зелёный цвет и т. д.)?"],
-  ["Есть ли у вас «икона стиля»? Кто?"],
-  ["Что ещё мне нужно знать о вас из того, что я могла не спросить?"],
+ [null, [
+  ["Возраст"],
+  ["Параметры клиента (рост/вес/размер одежды/размер обуви)"],
+  ["Тип фигуры (параметры: объём талии и бёдер)"],
+  ["Цвет волос"],
+  ["Цвет глаз"],
+  ["Носите ли Вы очки?"],
+  ["Место работы / должность"],
+  ["Есть ли на работе дресс-код?"],
+  ["Как обычно одеваетесь на работу?"],
+  ["Какое впечатление хотите производить на работе?"],
+  ["Как Вы проводите свободное время?"],
+  ["Посещаете ли Вы театр / кино / выставки / мероприятия?"],
+  ["Занимаетесь ли Вы спортом? Каким?"],
+  ["Что Вам в себе нравится?"],
+  ["Что Вы считаете достоинствами в своей внешности?"],
+  ["Что бы Вы хотели изменить в себе или скрыть?"],
+  ["Какие цвета преобладают в Вашем гардеробе?"],
+  ["В каких цветах Вы чувствуете себя комфортно?"],
+  ["Какие цвета Вам не нравятся?"],
+  ["В каких магазинах Вы обычно покупаете одежду? Есть ли любимые бренды?"],
+  ["Как часто Вы используете аксессуары? Какие?"],
+  ["Какую обувь Вы предпочитаете? Как относитесь к каблукам?"],
+  ["Ожидания от нового образа?"],
+  ["Существуют ли для Вас «икона стиля»? Кто?"],
+  ["Что мне нужно ещё о Вас знать из того, что я могла не спросить у Вас?"],
+  ["Что никогда не наденете?"],
  ]],
 ];
 
@@ -164,7 +149,7 @@ const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'
 let n = 0, html = "";
 const fields = [];
 for (const [title, items] of S) {
-  html += `<h2 class="sec">${esc(title)}</h2>`;
+  if (title) html += `<h2 class="sec">${esc(title)}</h2>`;
   for (const [q, o = {}] of items) {
     n++;
     const id = "q" + n;
@@ -193,7 +178,7 @@ document.querySelectorAll("textarea").forEach(t => t.addEventListener("input", (
 // keep a draft in this browser only (convenience; works without it)
 function save() {
   try {
-    const d = {};
+    const d = {nm: document.getElementById("nm").value};
     for (const f of fields) {
       d[f.id] = document.getElementById(f.id).value;
       if (f.chips) d[f.id + "c"] = [...document.querySelectorAll(`input[name="${f.id}c"]:checked`)].map(i => i.value);
@@ -203,7 +188,7 @@ function save() {
 }
 function load() {
   try {
-    const d = JSON.parse(localStorage.getItem(STORE) || "null"); if (!d) return;
+    const d = JSON.parse(localStorage.getItem(STORE) || "null"); if (!d) return; if (d.nm) document.getElementById("nm").value = d.nm;
     for (const f of fields) {
       const el = document.getElementById(f.id);
       if (d[f.id]) { el.value = d[f.id]; if (el.tagName === "TEXTAREA") grow(el); }
@@ -219,9 +204,9 @@ document.getElementById("f").addEventListener("submit", async ev => {
   ev.preventDefault();
   const err = document.getElementById("err"), btn = document.getElementById("btn");
   err.textContent = "";
-  const name = document.getElementById("q1").value.trim();
-  if (!name) { err.textContent = "Пожалуйста, укажите имя и фамилию"; document.getElementById("q1").focus(); return; }
-  const data = {};
+  const name = document.getElementById("nm").value.trim();
+  if (!name) { err.textContent = "Пожалуйста, укажите ваше имя"; document.getElementById("nm").focus(); return; }
+  const data = {"Имя": name};
   for (const f of fields) {
     let v = document.getElementById(f.id).value.trim();
     if (f.chips) {
