@@ -46,7 +46,10 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
 #count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30vh;font-weight:700;color:rgba(255,255,255,.85);pointer-events:none}
 
 #bar{position:absolute;left:0;right:0;bottom:0;background:rgba(25,25,25,.92);padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:15px;transition:opacity .4s}
-#bar.idle{opacity:0;pointer-events:none}
+#bar.idle{background:transparent}
+#bar.idle > *:not(#playBtn):not(#restartBtn):not(#recBtn){visibility:hidden}
+#bar.idle #opts > *{visibility:hidden}
+#bar.idle #playBtn,#bar.idle #restartBtn,#bar.idle #recBtn{opacity:.85}
 #opts{display:contents}
 #optBtn{display:none}
 #bar button{background:#3a3a3a;color:#fff;border:none;border-radius:8px;padding:9px 14px;cursor:pointer}
@@ -75,7 +78,6 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
   #optBtn{display:inline-block}
   #opts{display:none;width:100%;flex-wrap:wrap;gap:8px 14px}
   #bar.open #opts{display:flex}
-  #restartBtn{display:none}
   #bar{gap:8px 12px;padding:8px 10px;font-size:14px}
   #bar input[type=range]{width:90px}
   #bar button{padding:8px 10px}
@@ -243,7 +245,7 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
   function setPlaying(p){
     clearInterval(countT); $('count').classList.add('hidden');
     playing=p; last=0; cancelAnimationFrame(raf);
-    $('playBtn').textContent = p ? '❚❚ Пауза' : '▶ Старт';
+    $('playBtn').textContent = p ? '■ Стоп' : '▶ Старт';
     if(p){ raf=requestAnimationFrame(tick); wake(true); } else wake(false);
     poke();
   }
@@ -306,7 +308,7 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
     if(playing) idleT=setTimeout(function(){ $('bar').classList.add('idle'); },2500);
   }
   document.addEventListener('mousemove',poke);
-  document.addEventListener('touchstart',poke,{passive:true});
+  document.addEventListener('touchstart',function(e){ if(e.target.closest&&e.target.closest('#playBtn,#restartBtn,#recBtn')) return; poke(); },{passive:true});
   $('cam').addEventListener('click',poke);
 
   // keep the laptop screen awake while reading
