@@ -55,7 +55,7 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
 #bar input[type=range]{width:120px;accent-color:#c9794f}
 #bar .val{min-width:28px;color:#fff;font-variant-numeric:tabular-nums}
 #keys{color:#999;font-size:12px;width:100%}
-#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#000;display:none}
+#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);background:#000;display:none}
 #prompter.cammode #cam{display:block}
 #prompter.cammode #viewport{bottom:auto;height:var(--strip,35%);background:rgba(0,0,0,.55)}
 #prompter.cammode #fadeTop{display:none}
@@ -149,6 +149,7 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
     <label><input id="mirror" type="checkbox"> Зеркально</label>
     <label><input id="countdown" type="checkbox"> Отсчёт 3 с</label>
     <button id="fsBtn">⛶ Во весь экран</button>
+    <span class="camOnly" id="camRes" style="color:#aaa;font-size:13px"></span>
     </div>
     <div id="keys">Камера: видео с фронтальной камеры, текст полосой сверху, ближе к объективу. «Запись» снимает видео со звуком и запускает текст. Пробел — старт/пауза · ↑↓ скорость · + − шрифт · R в начало · M зеркало · Esc назад. Панель прячется, пока текст идёт; пошевелите мышью, чтобы она появилась.</div>
   </div>
@@ -327,10 +328,11 @@ h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
     $('prompter').classList.add('cammode'); $('camBtn').textContent='✕ Без камеры'; applySettings();
     if(stream) return;
     navigator.mediaDevices.getUserMedia({
-      video:(function(){var por=window.innerHeight>window.innerWidth; return {facingMode:'user',width:{ideal:por?1080:1920},height:{ideal:por?1920:1080},frameRate:{ideal:30}};})(),
+      video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}}, // sensor (landscape) terms; iPhone rotates to portrait itself. Asking 1080x1920 made iOS crop a 9:16 strip = heavy zoom
       audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}
     }).then(function(st){
       stream=st; var v=$('cam'); v.srcObject=st; v.play().catch(function(){});
+      v.onloadedmetadata=function(){ $('camRes').textContent='Камера: '+v.videoWidth+'×'+v.videoHeight; };
     }).catch(function(err){
       camErr('Нет доступа к камере или микрофону. Разрешите их для этого сайта в настройках браузера и нажмите «Камера» ещё раз. ('+(err&&err.name||err)+')');
       $('prompter').classList.remove('cammode'); $('camBtn').textContent='📷 Камера'; applySettings();
