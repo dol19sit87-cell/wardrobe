@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Суфлёр Ирины</title>
+<style>
+:root{--bg:#faf6f2;--card:#fff;--ink:#1d1a18;--muted:#7a6f68;--accent:#9a5a3c;--line:#eadfd6}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+.hidden{display:none!important}
+
+/* ---------- list screen ---------- */
+#home{max-width:820px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:30px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 24px}
+h2{font-size:18px;margin:28px 0 10px;color:var(--accent)}
+.item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 10px;cursor:pointer;color:inherit}
+.item:hover{border-color:var(--accent)}
+.day{flex:0 0 78px;font-weight:700;color:var(--accent)}
+.ttl{flex:1;font-size:18px}
+.del{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:6px}
+.del:hover{color:#c0392b}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 18px;cursor:pointer;font-weight:600}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+#editor{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:10px}
+#editor input,#editor textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 10px;background:#fff;color:var(--ink)}
+#editor textarea{min-height:220px;resize:vertical;line-height:1.5}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.help{color:var(--muted);font-size:14px;line-height:1.5;margin-top:24px}
+
+/* ---------- prompter screen ---------- */
+#prompter{position:fixed;inset:0;background:#000;color:#fff;overflow:hidden}
+#viewport{position:absolute;inset:0;overflow:hidden}
+#scroller{position:absolute;left:0;right:0;top:0;will-change:transform}
+#text{margin:0 auto;padding:0 6vw;font-weight:600;white-space:pre-wrap;word-wrap:break-word}
+#text p{margin:0 0 .9em}
+#prompter.mirror #viewport{transform:scaleX(-1)}
+#guide{position:absolute;left:0;right:0;height:0;border-top:2px solid rgba(255,190,120,.55);pointer-events:none}
+#guide:before,#guide:after{content:"▶";position:absolute;top:-15px;left:6px;color:rgba(255,190,120,.8);font-size:22px}
+#guide:after{content:"◀";left:auto;right:6px}
+#fadeTop{position:absolute;left:0;right:0;top:0;height:8%;background:linear-gradient(#000,transparent);pointer-events:none}
+#count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30vh;font-weight:700;color:rgba(255,255,255,.85);pointer-events:none}
+
+#bar{position:absolute;left:0;right:0;bottom:0;background:rgba(25,25,25,.92);padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:15px;transition:opacity .4s}
+#bar.idle{background:transparent}
+#bar.idle > *:not(#playBtn):not(#restartBtn):not(#recBtn){visibility:hidden}
+#bar.idle #opts > *{visibility:hidden}
+#bar.idle #playBtn,#bar.idle #restartBtn,#bar.idle #recBtn{opacity:.85}
+#opts{display:contents}
+#optBtn{display:none}
+#bar button{background:#3a3a3a;color:#fff;border:none;border-radius:8px;padding:9px 14px;cursor:pointer}
+#bar button.main{background:#c9794f;font-weight:700;min-width:120px}
+#bar label{display:flex;align-items:center;gap:8px;color:#ddd;white-space:nowrap}
+#bar input[type=range]{width:120px;accent-color:#c9794f}
+#bar .val{min-width:28px;color:#fff;font-variant-numeric:tabular-nums}
+#keys{color:#999;font-size:12px;width:100%}
+#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:scaleX(-1);background:#000;display:none}
+#prompter.cammode #cam{display:block}
+#prompter.cammode #viewport{bottom:auto;height:var(--strip,35%);background:rgba(0,0,0,.55)}
+#prompter.cammode #fadeTop{display:none}
+#prompter.cammode #text{text-shadow:0 2px 6px rgba(0,0,0,.9)}
+#bar .camOnly{display:none}
+#prompter.cammode #bar .camOnly{display:flex}
+#bar button.rec{background:#c0392b;font-weight:700}
+#bar button.rec.on{background:#fff;color:#c0392b}
+#recDot{position:absolute;right:14px;top:calc(var(--strip,35%) + 10px);background:#c0392b;color:#fff;border-radius:20px;padding:4px 12px;font-size:15px;font-weight:700;display:none}
+#recDot.on{display:block}
+#saveBox{z-index:5;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#1d1a18;border-radius:16px;padding:20px;width:min(92vw,420px);text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#saveBox video{width:100%;max-height:45vh;border-radius:10px;background:#000;margin-bottom:12px}
+#saveBox .row{justify-content:center}
+#camErr{position:absolute;left:16px;right:16px;bottom:120px;background:#fff3e0;color:#5a3a1a;border-radius:12px;padding:12px 14px;font-size:15px}
+@media (max-width:700px){
+  #keys{display:none}
+  #optBtn{display:inline-block}
+  #opts{display:none;width:100%;flex-wrap:wrap;gap:8px 14px}
+  #bar.open #opts{display:flex}
+  #bar{gap:8px 12px;padding:8px 10px;font-size:14px}
+  #bar input[type=range]{width:90px}
+  #bar button{padding:8px 10px}
+  #bar button.main{min-width:96px}
+  #text{padding:0 4vw}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Список сценариев ===== -->
+<div id="home">
+  <h1>Суфлёр</h1>
+  <p class="sub">Выберите сценарий. Текст пойдёт по экрану, читайте по оранжевой линии.</p>
+
+  <h2>Сценарии недели</h2>
+  <div id="list"></div>
+
+  <h2>Мои тексты</h2>
+  <div id="mine"></div>
+  <button class="btn ghost" id="newBtn">+ Вставить свой текст</button>
+  <div id="editor" class="hidden">
+    <input id="edTitle" placeholder="Название (например: Пуховик, дубль 2)">
+    <textarea id="edText" placeholder="Вставьте сюда текст, который будете читать"></textarea>
+    <div class="row">
+      <button class="btn" id="saveBtn">Сохранить</button>
+      <button class="btn ghost" id="readNowBtn">Читать без сохранения</button>
+      <button class="btn ghost" id="cancelBtn">Отмена</button>
+    </div>
+  </div>
+
+  <p class="help">
+    <b>Управление при чтении:</b> пробел — старт / пауза, ↑ ↓ — быстрее / медленнее,
+    + и − — шрифт, колёсико мыши или трекпад — прокрутить вручную, R — в начало, M — зеркально, Esc — назад к списку.
+    Настройки скорости и шрифта запоминаются. «Мои тексты» хранятся в этом браузере на этом ноутбуке.
+  </p>
+</div>
+
+<!-- ===== Суфлёр ===== -->
+<div id="prompter" class="hidden">
+  <video id="cam" autoplay muted playsinline></video>
+  <div id="viewport">
+    <div id="scroller"><div id="text"></div></div>
+  </div>
+  <div id="fadeTop"></div>
+  <div id="guide"></div>
+  <div id="count" class="hidden"></div>
+  <div id="recDot">● REC <span id="recTime">0:00</span></div>
+  <div id="camErr" class="hidden"></div>
+  <div id="saveBox" class="hidden">
+    <video id="playback" controls playsinline></video>
+    <div class="row">
+      <button class="btn" id="saveVidBtn">Сохранить видео</button>
+      <button class="btn ghost" id="discardBtn">Удалить и переснять</button>
+    </div>
+    <p id="saveHint" style="font-size:13px;color:#7a6f68;margin:10px 0 0">На iPhone в открывшемся меню нажмите «Сохранить видео», оно попадёт в Фото.</p>
+  </div>
+  <div id="bar">
+    <button id="backBtn">← Список</button>
+    <button id="playBtn" class="main">▶ Старт</button>
+    <button id="restartBtn">⟲ В начало</button>
+    <button id="camBtn">📷 Камера</button>
+    <button id="recBtn" class="rec camOnly">● Запись</button>
+    <button id="optBtn">⚙ Настройки</button>
+    <div id="opts">
+    <label class="camOnly">Полоса <input id="strip" type="range" min="20" max="70" step="5"><span class="val" id="stripV"></span></label>
+    <label>Скорость <input id="speed" type="range" min="1" max="20" step="1"><span class="val" id="speedV"></span></label>
+    <label>Шрифт <input id="size" type="range" min="28" max="140" step="2"><span class="val" id="sizeV"></span></label>
+    <label>Ширина <input id="width" type="range" min="40" max="100" step="5"><span class="val" id="widthV"></span></label>
+    <label>Линия <input id="line" type="range" min="10" max="60" step="5"><span class="val" id="lineV"></span></label>
+    <label><input id="mirror" type="checkbox"> Зеркально</label>
+    <label><input id="countdown" type="checkbox"> Отсчёт 3 с</label>
+    <button id="fsBtn">⛶ Во весь экран</button>
+    <span class="camOnly" id="camRes" style="color:#aaa;font-size:13px"></span>
+    </div>
+    <div id="keys">Камера: видео с фронтальной камеры, текст полосой сверху, ближе к объективу. «Запись» снимает видео со звуком и запускает текст. Пробел — старт/пауза · ↑↓ скорость · + − шрифт · R в начало · M зеркало · Esc назад. Панель прячется, пока текст идёт; пошевелите мышью, чтобы она появилась.</div>
+  </div>
+</div>
+
+<script src="scripts.js"></script>
+<script>
+(function(){
+  var $ = function(id){return document.getElementById(id)};
+  function load(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+  var S = load('sufler.settings',{});
+  var DEF={speed:5,size:(window.innerWidth<700?40:64),width:(window.innerWidth<700?100:80),line:30,mirror:false,countdown:true,cam:false,camSize:(window.innerWidth<700?30:44),strip:35,camLine:25};
+  for(var k in DEF) if(S[k]===undefined) S[k]=DEF[k];
+  function cam(){ return $('prompter').classList.contains('cammode'); }
+  function fs(){ return cam()?S.camSize:S.size; }
+  function ln(){ return cam()?S.camLine:S.line; }
+  function vh(){ return $('viewport').clientHeight || window.innerHeight; }
+  var mine = load('sufler.mine',[]);
+
+  /* ---------- list ---------- */
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function renderLists(){
+    var L = (window.SCRIPTS||[]).slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});
+    $('list').innerHTML = L.map(function(s,i){
+      return '<button class="item" data-src="w" data-i="'+(window.SCRIPTS.indexOf(s))+'"><span class="day">'+esc(s.day)+'</span><span class="ttl">'+esc(s.title)+'</span></button>';
+    }).join('') || '<p class="sub">Пока пусто</p>';
+    $('mine').innerHTML = mine.map(function(s,i){
+      return '<div class="item" data-src="m" data-i="'+i+'"><span class="day">свой</span><span class="ttl">'+esc(s.title||'Без названия')+'</span><button class="del" data-del="'+i+'" title="Удалить">удалить</button></div>';
+    }).join('');
+  }
+  document.addEventListener('click',function(e){
+    var d = e.target.closest('[data-del]');
+    if(d){ e.stopPropagation(); if(confirmDelete(+d.dataset.del)) return; return; }
+    var it = e.target.closest('.item');
+    if(!it) return;
+    var i=+it.dataset.i;
+    if(it.dataset.src==='w') openPrompter(window.SCRIPTS[i].text);
+    else openPrompter(mine[i].text);
+  });
+  function confirmDelete(i){
+    var b=document.querySelector('[data-del="'+i+'"]');
+    if(b.dataset.armed){ mine.splice(i,1); save('sufler.mine',mine); renderLists(); return true; }
+    b.dataset.armed='1'; b.textContent='точно удалить?'; b.style.color='#c0392b';
+    setTimeout(function(){ if(b.isConnected){ delete b.dataset.armed; b.textContent='удалить'; b.style.color=''; } },3000);
+    return false;
+  }
+  $('newBtn').onclick=function(){ $('editor').classList.remove('hidden'); $('edTitle').focus(); };
+  $('cancelBtn').onclick=function(){ $('editor').classList.add('hidden'); };
+  $('saveBtn').onclick=function(){
+    var t=$('edText').value.trim(); if(!t){ $('edText').focus(); return; }
+    mine.unshift({title:$('edTitle').value.trim()||t.slice(0,40),text:t}); save('sufler.mine',mine);
+    $('edTitle').value=''; $('edText').value=''; $('editor').classList.add('hidden'); renderLists();
+  };
+  $('readNowBtn').onclick=function(){ var t=$('edText').value.trim(); if(t) openPrompter(t); };
+
+  /* ---------- prompter ---------- */
+  var pos=0, playing=false, last=0, raf=0, idleT=0, countT=0;
+  var scroller=$('scroller'), textEl=$('text');
+
+  function applySettings(){
+    $('speed').value=S.speed; $('speedV').textContent=S.speed;
+    $('size').value=fs(); $('sizeV').textContent=fs();
+    $('strip').value=S.strip; $('stripV').textContent=S.strip+'%';
+    $('prompter').style.setProperty('--strip',S.strip+'%');
+    $('width').value=S.width; $('widthV').textContent=S.width+'%';
+    $('line').value=ln(); $('lineV').textContent=ln()+'%';
+    $('mirror').checked=S.mirror; $('countdown').checked=S.countdown;
+    textEl.style.fontSize=fs()+'px'; textEl.style.lineHeight='1.35';
+    textEl.style.maxWidth=S.width+'vw';
+    $('guide').style.top=(cam()? S.strip*ln()/100 : ln())+'%';
+    $('prompter').classList.toggle('mirror',S.mirror);
+    padTop(); save('sufler.settings',S); draw();
+  }
+  function padTop(){ // text starts on the reading line and can scroll fully past it
+    var h=vh();
+    textEl.style.paddingTop=(h*ln()/100 - fs()*0.6)+'px';
+    textEl.style.paddingBottom=(h*0.9)+'px';
+  }
+  function maxPos(){ return Math.max(0, scroller.offsetHeight - vh()*(1-ln()/100) + fs()); }
+  function draw(){ pos=Math.max(0,Math.min(pos,maxPos())); scroller.style.transform='translateY('+(-pos)+'px)'; }
+  function pxPerSec(){ return S.speed*S.speed*1.2 + S.speed*6; } // gentle at low values, fast at high
+  function tick(t){
+    if(!playing) return;
+    if(last) pos += pxPerSec()*(t-last)/1000;
+    last=t; draw();
+    if(pos>=maxPos()){ setPlaying(false); if(rec&&rec.state==='recording') setTimeout(stopRec,1500); return; }
+    raf=requestAnimationFrame(tick);
+  }
+  function setPlaying(p){
+    clearInterval(countT); $('count').classList.add('hidden');
+    playing=p; last=0; cancelAnimationFrame(raf);
+    $('playBtn').textContent = p ? '■ Стоп' : '▶ Старт';
+    if(p){ raf=requestAnimationFrame(tick); wake(true); } else wake(false);
+    poke();
+  }
+  function start(){
+    if(playing){ setPlaying(false); return; }
+    if(!S.countdown){ setPlaying(true); return; }
+    var n=3, c=$('count'); c.textContent=n; c.classList.remove('hidden');
+    $('playBtn').textContent='… отмена';
+    clearInterval(countT);
+    countT=setInterval(function(){ n--; if(n<=0){ clearInterval(countT); setPlaying(true); } else c.textContent=n; },1000);
+  }
+  function togglePlay(){ if(!$('count').classList.contains('hidden')){ clearInterval(countT); $('count').classList.add('hidden'); $('playBtn').textContent='▶ Старт'; return; } start(); }
+
+  function openPrompter(text){
+    textEl.innerHTML = text.split(/\n\s*\n/).map(function(p){return '<p>'+esc(p.trim()).replace(/\n/g,'<br>')+'</p>'}).join('');
+    $('home').classList.add('hidden'); $('prompter').classList.remove('hidden');
+    pos=0; applySettings(); setPlaying(false); window.scrollTo(0,0);
+    if(S.cam) camOn();
+  }
+  function closePrompter(){
+    setPlaying(false); stopRec(); camOff(true); $('saveBox').classList.add('hidden');
+    if(document.fullscreenElement) document.exitFullscreen().catch(function(){});
+    $('prompter').classList.add('hidden'); $('home').classList.remove('hidden');
+  }
+
+  // controls
+  $('playBtn').onclick=togglePlay;
+  $('restartBtn').onclick=function(){ setPlaying(false); pos=0; draw(); };
+  $('backBtn').onclick=closePrompter;
+  ['speed','width','strip'].forEach(function(k){ $(k).oninput=function(){ S[k]=+this.value; applySettings(); }; });
+  $('size').oninput=function(){ if(cam()) S.camSize=+this.value; else S.size=+this.value; applySettings(); };
+  $('line').oninput=function(){ if(cam()) S.camLine=+this.value; else S.line=+this.value; applySettings(); };
+  $('mirror').onchange=function(){ S.mirror=this.checked; applySettings(); };
+  $('countdown').onchange=function(){ S.countdown=this.checked; applySettings(); };
+  $('fsBtn').onclick=function(){
+    if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(function(){});
+  };
+  window.addEventListener('resize',function(){ if(!$('prompter').classList.contains('hidden')){ padTop(); draw(); } });
+  $('viewport').addEventListener('wheel',function(e){ e.preventDefault(); pos += (S.mirror?1:1)*e.deltaY; draw(); },{passive:false});
+  $('viewport').addEventListener('click',togglePlay);
+
+  document.addEventListener('keydown',function(e){
+    if($('prompter').classList.contains('hidden')) return;
+    var k=e.key;
+    if(k===' '||k==='Spacebar'){ e.preventDefault(); togglePlay(); }
+    else if(k==='ArrowUp'){ e.preventDefault(); S.speed=Math.min(20,S.speed+1); applySettings(); poke(); }
+    else if(k==='ArrowDown'){ e.preventDefault(); S.speed=Math.max(1,S.speed-1); applySettings(); poke(); }
+    else if(k==='+'||k==='='){ if(cam()) S.camSize=Math.min(140,S.camSize+4); else S.size=Math.min(140,S.size+4); applySettings(); }
+    else if(k==='-'||k==='_'){ if(cam()) S.camSize=Math.max(20,S.camSize-4); else S.size=Math.max(28,S.size-4); applySettings(); }
+    else if(k==='r'||k==='R'||k==='к'||k==='К'){ setPlaying(false); pos=0; draw(); }
+    else if(k==='m'||k==='M'||k==='ь'||k==='Ь'){ S.mirror=!S.mirror; applySettings(); }
+    else if(k==='PageDown'){ e.preventDefault(); pos+=window.innerHeight*0.5; draw(); }
+    else if(k==='PageUp'){ e.preventDefault(); pos-=window.innerHeight*0.5; draw(); }
+    else if(k==='Escape'){ if(!document.fullscreenElement) closePrompter(); }
+  });
+
+  // hide the panel while reading; show on mouse move
+  function poke(){
+    $('bar').classList.remove('idle'); clearTimeout(idleT);
+    if(playing) idleT=setTimeout(function(){ $('bar').classList.add('idle'); },2500);
+  }
+  document.addEventListener('mousemove',poke);
+  document.addEventListener('touchstart',function(e){ if(e.target.closest&&e.target.closest('#playBtn,#restartBtn,#recBtn')) return; poke(); },{passive:true});
+  $('cam').addEventListener('click',poke);
+
+  // keep the laptop screen awake while reading
+  var lock=null;
+  function wake(on){
+    try{
+      if(on && navigator.wakeLock && !lock){ navigator.wakeLock.request('screen').then(function(l){lock=l; l.addEventListener('release',function(){lock=null});}).catch(function(){}); }
+      if(!on && lock){ lock.release(); lock=null; }
+    }catch(e){}
+  }
+
+  /* ---------- front camera + recording ---------- */
+  var stream=null, rec=null, chunks=[], recBlob=null, recStart=0, recTimer=0, recType='';
+  $('size').min=20;
+  function camErr(msg){ var e=$('camErr'); if(msg){ e.textContent=msg; e.classList.remove('hidden'); } else e.classList.add('hidden'); }
+  function camOn(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ camErr('Этот браузер не даёт доступ к камере. Откройте сайт в Safari или Chrome.'); return; }
+    camErr('');
+    $('prompter').classList.add('cammode'); $('camBtn').textContent='✕ Без камеры'; applySettings();
+    if(stream) return;
+    navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user',width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}}, // sensor (landscape) terms; iPhone rotates to portrait itself. Asking 1080x1920 made iOS crop a 9:16 strip = heavy zoom
+      audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}
+    }).then(function(st){
+      stream=st; var v=$('cam'); v.srcObject=st; v.play().catch(function(){});
+      v.onloadedmetadata=function(){ $('camRes').textContent='Камера: '+v.videoWidth+'×'+v.videoHeight; };
+    }).catch(function(err){
+      camErr('Нет доступа к камере или микрофону. Разрешите их для этого сайта в настройках браузера и нажмите «Камера» ещё раз. ('+(err&&err.name||err)+')');
+      $('prompter').classList.remove('cammode'); $('camBtn').textContent='📷 Камера'; applySettings();
+    });
+  }
+  function camOff(keepPref){
+    if(stream){ stream.getTracks().forEach(function(t){t.stop()}); stream=null; }
+    $('cam').srcObject=null; $('prompter').classList.remove('cammode'); $('camBtn').textContent='📷 Камера';
+    if(!keepPref){ S.cam=false; } applySettings();
+  }
+  $('camBtn').onclick=function(){ if(cam()){ stopRec(); camOff(); } else { S.cam=true; camOn(); } };
+  function pickType(){
+    var c=['video/mp4;codecs=avc1,mp4a','video/mp4','video/webm;codecs=vp9,opus','video/webm'];
+    if(!window.MediaRecorder) return null;
+    for(var i=0;i<c.length;i++) if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(c[i])) return c[i];
+    return '';
+  }
+  function startRec(){
+    if(!stream){ camErr('Сначала включите камеру.'); return; }
+    var t=pickType(); if(t===null){ camErr('Этот браузер не умеет записывать видео. Снимайте камерой телефона, а суфлёр держите на ноутбуке.'); return; }
+    chunks=[]; recType=t;
+    try{ rec=new MediaRecorder(stream, t?{mimeType:t,videoBitsPerSecond:8000000,audioBitsPerSecond:192000}:undefined); }
+    catch(e){ rec=new MediaRecorder(stream); }
+    rec.ondataavailable=function(e){ if(e.data&&e.data.size) chunks.push(e.data); };
+    rec.onstop=function(){
+      recBlob=new Blob(chunks,{type:(rec.mimeType||recType||'video/mp4').split(';')[0]});
+      var pb=$('playback'); pb.src=URL.createObjectURL(recBlob); $('saveBox').classList.remove('hidden'); $('bar').classList.remove('open');
+    };
+    rec.start(1000); recStart=Date.now();
+    $('recBtn').textContent='■ Стоп'; $('recBtn').classList.add('on'); $('recDot').classList.add('on');
+    recTimer=setInterval(function(){ var s=Math.floor((Date.now()-recStart)/1000); $('recTime').textContent=Math.floor(s/60)+':'+('0'+s%60).slice(-2); },500);
+    pos=0; draw(); if(!playing) start();
+  }
+  function stopRec(){
+    clearInterval(recTimer); $('recDot').classList.remove('on'); $('recBtn').textContent='● Запись'; $('recBtn').classList.remove('on');
+    if(rec&&rec.state!=='inactive'){ rec.stop(); setPlaying(false); }
+  }
+  $('recBtn').onclick=function(){ if(rec&&rec.state==='recording') stopRec(); else startRec(); };
+  function fileName(){
+    var d=new Date(), p=function(n){return ('0'+n).slice(-2)};
+    var ext=/mp4/.test(recBlob.type)?'mp4':'webm';
+    return 'дубль '+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+'-'+p(d.getMinutes())+'-'+p(d.getSeconds())+'.'+ext;
+  }
+  $('saveVidBtn').onclick=function(){
+    if(!recBlob) return;
+    var f; try{ f=new File([recBlob],fileName(),{type:recBlob.type}); }catch(e){}
+    if(f && navigator.canShare && navigator.canShare({files:[f]}) && /iPhone|iPad|Android/i.test(navigator.userAgent)){
+      navigator.share({files:[f]}).catch(function(){});
+    } else {
+      var a=document.createElement('a'); a.href=$('playback').src; a.download=fileName(); document.body.appendChild(a); a.click(); a.remove();
+    }
+  };
+  $('optBtn').onclick=function(){ $('bar').classList.toggle('open'); };
+  $('discardBtn').onclick=function(){ $('saveBox').classList.add('hidden'); $('playback').removeAttribute('src'); recBlob=null; pos=0; draw(); };
+  document.addEventListener('visibilitychange',function(){ if(document.hidden&&rec&&rec.state==='recording') stopRec(); });
+
+  renderLists();
+})();
+</script>
+</body>
+</html>
